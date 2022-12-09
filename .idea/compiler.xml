@@ -6,7 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="xd-product-service" />
+        <module name="xd-user-service" />
+        <module name="xd-order-service" />
+        <module name="xd-gateway" />
         <module name="xd-common" />
+        <module name="xd-coupon-service" />
       </profile>
     </annotationProcessing>
   </component>
