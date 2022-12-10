@@ -18,7 +18,138 @@
     </modules>
 
     <properties>
+        <!-- jdk version -->
+        <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
+
+        <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
+        <spring.cloud.version>Hoxton.SR8</spring.cloud.version>
+        <alibaba.cloud.version>2.2.1.RELEASE</alibaba.cloud.version>
+        <mybatisplus.boot.starter.version>3.4.0</mybatisplus.boot.starter.version>
+        <lombok.version>1.18.16</lombok.version>
+        <commons.lang3.version>3.9</commons.lang3.version>
+        <commons.codec.version>1.15</commons.codec.version>
+        <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
+        <docker.image.prefix>xd-cloud</docker.image.prefix>
+        <!-- skip unit test -->
+        <skipTests>true</skipTests>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies/2.3.3.RELEASE-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!--https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies/Hoxton.SR8-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!--https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-alibaba-dependencies/2.2.1.RELEASE-->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${alibaba.cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!--integration of mybatis plus and springboot-->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatisplus.boot.starter.version}</version>
+            </dependency>
+
+            <!--https://mvnrepository.com/artifact/org.projectlombok/lombok/1.18.16-->
+            <!--scope=provided，means only work in compile，do not need in build
+            , Lombok come with lombok annotaion, Java can successfully compile to class file-->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!--https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+
+            <!--https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+            <!-- use for encryption -->
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>codec</artifactId>
+                <version>${commons.codec.version}</version>
+            </dependency>
+
+            <!-- interface document dependency -->
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-boot-starter</artifactId>
+                <version>${springfox.boot.starter.version}
+                </version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- code base from china -->
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>maven-ali</id>-->
+<!--            <url>http://maven.aliyun.com/nexus/content/groups/public//</url>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--            </releases>-->
+<!--            <snapshots>-->
+<!--                <enabled>true</enabled>-->
+<!--                <updatePolicy>always</updatePolicy>-->
+<!--                <checksumPolicy>fail</checksumPolicy>-->
+<!--            </snapshots>-->
+<!--        </repository>-->
+<!--    </repositories>-->
+
+<!--    <pluginRepositories>-->
+<!--        <pluginRepository>-->
+<!--            <id>public</id>-->
+<!--            <name>aliyun nexus</name>-->
+<!--            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>-->
+<!--            <releases>-->
+<!--                <enabled>true</enabled>-->
+<!--            </releases>-->
+<!--            <snapshots>-->
+<!--                <enabled>false</enabled>-->
+<!--            </snapshots>-->
+<!--        </pluginRepository>-->
+<!--    </pluginRepositories>-->
+
+    <!--module don't need build version-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    <fork>true</fork>
+                    <addResources>true</addResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
