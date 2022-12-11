@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.example.exception.BizException;
 import org.example.mapper.AddressMapper;
 import org.example.model.AddressDO;
 import org.example.service.AddressService;
@@ -38,7 +39,9 @@ public class AddressController {
             @ApiParam(value = "address id", required = true)
             @PathVariable("address_id") Long addressId) {
         AddressDO addressDO = addressService.detail(addressId);
-
+//        if (addressId == 1) {
+//            throw new BizException(-1, "test");
+//        }
         return JsonData.buildSuccess(addressDO);
     }
 }
