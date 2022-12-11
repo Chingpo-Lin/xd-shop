@@ -23,50 +23,49 @@ public class AddressDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户id
+     * user id
      */
     private Long userId;
 
     /**
-     * 是否默认收货地址:0->否;1->是
+     * if default address:0->no;1->yes
      */
     private Integer defaultStatus;
 
     /**
-     * 收发货人姓名
+     * receive name
      */
     private String receiveName;
 
     /**
-     * 收货人电话
+     * receive phone
      */
     private String phone;
 
     /**
-     * 省/直辖市
+     * province
      */
     private String province;
 
     /**
-     * 市
+     * city
      */
     private String city;
 
     /**
-     * 区
+     * region
      */
     private String region;
 
     /**
-     * 详细地址
+     * detail address
      */
     private String detailAddress;
 
     private Date createTime;
-
 
 }

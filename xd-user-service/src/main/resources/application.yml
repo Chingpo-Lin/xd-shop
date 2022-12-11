@@ -1,0 +1,23 @@
+
+server:
+  port: 9001
+
+spring:
+  application:
+    name: xd-user-service
+  # database config
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://120.24.94.91:3306/xd_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: xdclass.net168
+
+# config mybatis plus print sql
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# config log level,ERROR/WARN/INFO/DEBUG,default is show when higher than INFO level
+logging:
+  level:
+    root: INFO

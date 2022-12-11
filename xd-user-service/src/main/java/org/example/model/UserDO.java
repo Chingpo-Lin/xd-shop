@@ -23,54 +23,48 @@ public class UserDO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
-     * 昵称
+     * name
      */
     private String name;
 
     /**
-     * 密
-码
+     * password
      */
     private String pwd;
 
     /**
-     * 头像
+     * avatar
      */
     private String headImg;
 
     /**
-     * 用户签名
+     * sign
      */
     private String slogan;
 
     /**
-     * 0表示
-女，1表示男
+     * 0 is female，1 is male
      */
     private Integer sex;
 
     /**
-     * 积
-分
+     * point
      */
     private Integer points;
 
     private Date createTime;
 
     /**
-     * 邮
-箱
+     * email
      */
     private String mail;
 
     /**
-     * 盐，用于个人敏感信息处理
+     * secret for privacy
      */
     private String secret;
-
-
 }
