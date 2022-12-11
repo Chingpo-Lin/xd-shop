@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiParam;
 import org.example.mapper.AddressMapper;
 import org.example.model.AddressDO;
 import org.example.service.AddressService;
+import org.example.utils.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +38,8 @@ public class AddressController {
             @ApiParam(value = "address id", required = true)
             @PathVariable("address_id") Long addressId) {
         AddressDO addressDO = addressService.detail(addressId);
-        return addressDO;
+
+        return JsonData.buildSuccess(addressDO);
     }
 }
 
