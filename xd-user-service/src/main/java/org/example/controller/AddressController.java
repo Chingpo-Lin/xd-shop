@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Bob
  * @since 2022-12-10
  */
-@Api(tags="receive address")
+@Api(tags="receive address module")
 @RestController
 @RequestMapping("/api/address/v1/")
 public class AddressController {
