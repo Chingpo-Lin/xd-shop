@@ -18,7 +18,7 @@ public enum BizCodeEnum {
     CODE_TO_ERROR(240001,"receive number does not match rules"),
     CODE_LIMITED(240002,"code send too quick"),
     CODE_ERROR(240003,"code error"),
-    CODE_CAPTCHA(240101,"picture code error"),
+    CODE_CAPTCHA_ERROR(240101,"picture code error"),
     /**
      * account
      * */
