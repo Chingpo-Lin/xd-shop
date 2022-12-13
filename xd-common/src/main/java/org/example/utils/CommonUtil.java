@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
+import java.util.Random;
 
 public class CommonUtil {
 
@@ -71,5 +72,20 @@ public class CommonUtil {
             exception.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * get random val
+     * @param length
+     * @return
+     */
+    public static String getRandomCode(int length) {
+        String sources = "0123456789";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(sources.charAt(random.nextInt(9)));
+        }
+        return sb.toString();
     }
 }
