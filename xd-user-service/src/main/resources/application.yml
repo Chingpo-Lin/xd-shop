@@ -11,6 +11,22 @@ spring:
     url: jdbc:mysql://120.24.94.91:3306/xd_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: xdclass.net168
+  # redis config
+  redis:
+    host: 120.24.94.91
+    port: 6379
+    password: ljb112233
+  # mail config
+  mail:
+    host: smtp.163.com # sending server
+    username: m13823601165@163.com
+    password: GJSNNUGBGTDTLQKZ # confirmation code
+    from: m13823601165@163.com # sending mail, same use username
+    properties.mail.smtp.starttls.enable: true
+    properties.mail.smtp.starttls.required: true
+    properties.mail.smtp.ssl.enable: true
+    default-encoding: utf-8
+
 
 # config mybatis plus print sql
 mybatis-plus:
