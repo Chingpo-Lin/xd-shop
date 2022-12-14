@@ -88,4 +88,12 @@ public class CommonUtil {
         }
         return sb.toString();
     }
+
+    /**
+     * get current timestamp
+     * @return
+     */
+    public static long getCurrentTimestamp() {
+        return System.currentTimeMillis();
+    }
 }
