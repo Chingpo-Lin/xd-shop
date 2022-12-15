@@ -3,13 +3,10 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Annotation profile for xd-shop" enabled="true">
+      <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$MAVEN_REPOSITORY$/org/springframework/boot/spring-boot-configuration-processor/2.3.3.RELEASE/spring-boot-configuration-processor-2.3.3.RELEASE.jar" />
-        </processorPath>
         <module name="xd-product-service" />
         <module name="xd-user-service" />
         <module name="xd-order-service" />
