@@ -39,7 +39,7 @@ public class FileServiceImpl implements FileService {
 
         // jdk8 date format
         LocalDateTime ldt = LocalDateTime.now();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/mm/dd");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
         String folder = dtf.format(ldt);
 
         // build path, store in oss 2022/12/1/UUID.jpg

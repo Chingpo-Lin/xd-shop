@@ -1,5 +1,6 @@
 package org.example.enums;
 
+import lombok.Data;
 import lombok.Getter;
 
 /**
@@ -19,12 +20,18 @@ public enum BizCodeEnum {
     CODE_LIMITED(240002,"code send too quick"),
     CODE_ERROR(240003,"code error"),
     CODE_CAPTCHA_ERROR(240101,"picture code error"),
+
     /**
      * account
      * */
     ACCOUNT_REPEAT(250001,"account already exist"),
     ACCOUNT_UNREGISTER(250002,"account not exist"),
-    ACCOUNT_PWD_ERROR(250003,"name or password error");
+    ACCOUNT_PWD_ERROR(250003,"name or password error"),
+
+    /**
+     * file related
+     */
+    FILE_UPLOAD_USER_IMG_FAIL(600101,"用户头像文件上传失败");
 
     @Getter
     private String msg;
@@ -32,8 +39,10 @@ public enum BizCodeEnum {
     @Getter
     private int code;
 
-    private BizCodeEnum(int code, String msg) {
+    private BizCodeEnum(int code, String msg){
         this.code = code;
         this.msg = msg;
     }
+
+
 }
