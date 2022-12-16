@@ -105,4 +105,19 @@ public class CommonUtil {
     public static String generateUUID() {
         return UUID.randomUUID().toString().replaceAll("-", "").substring(0, 32);
     }
+
+    /**
+     * get random length string
+     * @param len
+     * @return
+     */
+    private static final String ALL_CHAR_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    public static String getStringNumRandom(int len) {
+        Random random = new Random();
+        StringBuilder saltString = new StringBuilder(len);
+        for (int i = 1; i <= len; ++i) {
+            saltString.append(ALL_CHAR_NUM.charAt(random.nextInt(ALL_CHAR_NUM.length())));
+        }
+        return saltString.toString();
+    }
 }

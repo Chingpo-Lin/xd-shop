@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.example.enums.BizCodeEnum;
 import org.example.enums.SendCodeEnum;
 import org.example.mapper.UserMapper;
@@ -8,6 +9,7 @@ import org.example.model.UserDO;
 import org.example.request.UserRegisterRequest;
 import org.example.service.NotifyService;
 import org.example.service.UserService;
+import org.example.utils.CommonUtil;
 import org.example.utils.JsonData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +57,11 @@ public class UserServiceImpl implements UserService {
         userDO.setCreateTime(new Date());
         userDO.setSlogan("Hello, I am " + userDO.getName());
         // set password TODO
+        // generate password with MD5 + secret
+        userDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
+
+        String cryptPwd = Md5Crypt.md5Crypt(registerRequest.getPwd().getBytes(), userDO.getSecret());
+        userDO.setPwd(cryptPwd);
 
         // check if email exist TODO
         if (checkUnique(userDO.getMail())) {
@@ -76,7 +83,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     private boolean checkUnique(String mail) {
-        return false;
+        return true;
     }
 
     /**
