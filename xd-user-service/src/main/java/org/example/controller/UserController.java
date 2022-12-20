@@ -5,6 +5,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.example.enums.BizCodeEnum;
+import org.example.request.UserLoginRequest;
 import org.example.request.UserRegisterRequest;
 import org.example.service.FileService;
 import org.example.service.UserService;
@@ -52,11 +53,27 @@ public class UserController {
         return result != null ? JsonData.buildSuccess(result) : JsonData.buildResult(BizCodeEnum.FILE_UPLOAD_USER_IMG_FAIL);
     }
 
+    /**
+     * user register
+     * @param registerRequest
+     * @return
+     */
     @ApiOperation("user register")
     @PostMapping("register")
     public JsonData register(@ApiParam("user register object") @RequestBody UserRegisterRequest registerRequest) {
 
         JsonData jsonData = userService.register(registerRequest);
+        return jsonData;
+    }
+
+    /**
+     * user login
+     * @return
+     */
+    @ApiOperation("user login")
+    @PostMapping("login")
+    public JsonData login(@ApiParam("user login object") @RequestBody UserLoginRequest userLoginRequest) {
+        JsonData jsonData = userService.login(userLoginRequest);
         return jsonData;
     }
 }
