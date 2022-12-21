@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.spring.web.json.Json;
 
+import java.util.Map;
+
 /**
  * <p>
  * user controller
@@ -76,5 +78,20 @@ public class UserController {
         JsonData jsonData = userService.login(userLoginRequest);
         return jsonData;
     }
+
+//    /**
+//     * refresh token
+//     * @param param
+//     * @return
+//     */
+//    @PostMapping("refresh_token")
+//    public JsonData getRefreshToken(Map<String, Object> param) {
+//        // find refresh token in redis
+//        // if exist, decode accesstoken
+//        // call jwt generate token again, generate a new access token
+//        // generate a new refresh token and reset expire date
+//        // return to frontend
+//        return null;
+//    }
 }
 

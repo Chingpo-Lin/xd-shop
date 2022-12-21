@@ -27,6 +27,7 @@ public enum BizCodeEnum {
     ACCOUNT_REPEAT(250001,"account already exist"),
     ACCOUNT_UNREGISTER(250002,"account not exist"),
     ACCOUNT_PWD_ERROR(250003,"name or password error"),
+    ACCOUNT_NOT_LOGIN(250004,"account not login"),
 
     /**
      * file related
