@@ -2,6 +2,10 @@ package org.example.service;
 
 import org.example.model.AddressDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.example.request.AddressAddRequest;
+import org.example.vo.AddressVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,5 +17,25 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface AddressService {
 
-    public AddressDO detail(Long id);
+    AddressVO detail(Long id);
+
+    /**
+     * add address
+     * @param addressAddRequest
+     * @return
+     */
+    int add(AddressAddRequest addressAddRequest);
+
+    /**
+     * delete address by id
+     * @param addressId
+     * @return
+     */
+    int del(int addressId);
+
+    /**
+     * list all current user address
+     * @return
+     */
+    List<AddressVO> listAllUserAddress();
 }

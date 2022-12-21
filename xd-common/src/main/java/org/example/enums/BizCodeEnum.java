@@ -30,9 +30,14 @@ public enum BizCodeEnum {
     ACCOUNT_NOT_LOGIN(250004,"account not login"),
 
     /**
+     * address
+     */
+    ADDRESS_NOT_EXIST(290001, "address not exist"),
+    ADDRESS_DEL_FAIL(290001, "address delete fail"),
+    /**
      * file related
      */
-    FILE_UPLOAD_USER_IMG_FAIL(600101,"用户头像文件上传失败");
+    FILE_UPLOAD_USER_IMG_FAIL(600101,"user avatar upload fail");
 
     @Getter
     private String msg;
