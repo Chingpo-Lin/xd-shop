@@ -17,6 +17,8 @@ import org.example.vo.AddressVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * <p>
  * address controller
@@ -60,6 +62,17 @@ public class AddressController {
         int rows = addressService.del(addressId);
 
         return rows == 1 ? JsonData.buildSuccess() : JsonData.buildResult(BizCodeEnum.ADDRESS_DEL_FAIL);
+    }
+
+    /**
+     * find all address of current user
+     * @return
+     */
+    @ApiOperation("list all current user address")
+    @GetMapping("/list")
+    public JsonData listAllUserAddress() {
+        List<AddressVO> addressVOList = addressService.listAllUserAddress();
+        return JsonData.buildSuccess(addressVOList);
     }
 }
 

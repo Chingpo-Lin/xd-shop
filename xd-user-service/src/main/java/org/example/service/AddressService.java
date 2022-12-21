@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.example.request.AddressAddRequest;
 import org.example.vo.AddressVO;
 
+import java.util.List;
+
 /**
  * <p>
  * address service interface
@@ -30,4 +32,10 @@ public interface AddressService {
      * @return
      */
     int del(int addressId);
+
+    /**
+     * list all current user address
+     * @return
+     */
+    List<AddressVO> listAllUserAddress();
 }
