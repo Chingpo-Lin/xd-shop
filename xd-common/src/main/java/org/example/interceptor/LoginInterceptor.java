@@ -1,6 +1,7 @@
 package org.example.interceptor;
 
 import io.jsonwebtoken.Claims;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.example.enums.BizCodeEnum;
 import org.example.model.LoginUser;
@@ -38,11 +39,18 @@ public class LoginInterceptor implements HandlerInterceptor {
             String name = (String) claims.get("name");
             String mail = (String) claims.get("mail");
 
-            LoginUser loginUser = new LoginUser();
-            loginUser.setName(name);
-            loginUser.setId(userId);
-            loginUser.setHeadImg(headImg);
-            loginUser.setMail(mail);
+            LoginUser loginUser = LoginUser
+                    .builder()
+                    .headImg(headImg)
+                    .name(name)
+                    .id(userId)
+                    .mail(mail)
+                    .build();
+
+//            loginUser.setName(name);
+//            loginUser.setId(userId);
+//            loginUser.setHeadImg(headImg);
+//            loginUser.setMail(mail);
 
             // use attribute to get user info
             // request.setAttribute("loginUser", loginUser);

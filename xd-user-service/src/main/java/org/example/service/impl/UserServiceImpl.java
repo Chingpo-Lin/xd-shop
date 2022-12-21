@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.example.enums.BizCodeEnum;
 import org.example.enums.SendCodeEnum;
+import org.example.interceptor.LoginInterceptor;
 import org.example.mapper.UserMapper;
 import org.example.model.LoginUser;
 import org.example.model.UserDO;
@@ -16,6 +17,7 @@ import org.example.service.UserService;
 import org.example.utils.CommonUtil;
 import org.example.utils.JWTUtil;
 import org.example.utils.JsonData;
+import org.example.vo.UserVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -106,7 +108,7 @@ public class UserServiceImpl implements UserService {
             String cryptPwd = Md5Crypt.md5Crypt(userLoginRequest.getPwd().getBytes(), userDO.getSecret());
             if (cryptPwd.equals(userDO.getPwd())) {
                 // login success, generate token TODO
-                LoginUser loginUser = new LoginUser();
+                LoginUser loginUser = LoginUser.builder().build();
                 BeanUtils.copyProperties(userDO, loginUser);
                 String accessToken = JWTUtil.geneJsonWebToken(loginUser);
                 // accesstoken
@@ -125,6 +127,22 @@ public class UserServiceImpl implements UserService {
             // account not exist
             return JsonData.buildResult(BizCodeEnum.ACCOUNT_PWD_ERROR);
         }
+    }
+
+    /**
+     * find user detail
+     * @return
+     */
+    @Override
+    public UserVO findUserDetail() {
+
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        UserDO userDO = userMapper.selectOne(new QueryWrapper<UserDO>().eq("id", loginUser.getId()));
+
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(userDO, userVO);
+
+        return userVO;
     }
 
     /**
