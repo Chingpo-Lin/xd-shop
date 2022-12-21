@@ -1,20 +1,25 @@
 package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.example.enums.BizCodeEnum;
 import org.example.enums.SendCodeEnum;
 import org.example.mapper.UserMapper;
+import org.example.model.LoginUser;
 import org.example.model.UserDO;
 import org.example.request.UserLoginRequest;
 import org.example.request.UserRegisterRequest;
 import org.example.service.NotifyService;
 import org.example.service.UserService;
 import org.example.utils.CommonUtil;
+import org.example.utils.JWTUtil;
 import org.example.utils.JsonData;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -30,6 +35,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+//    @Autowired
+//    private StringRedisTemplate redisTemplate;
 
     /**
      * user register
@@ -98,7 +106,16 @@ public class UserServiceImpl implements UserService {
             String cryptPwd = Md5Crypt.md5Crypt(userLoginRequest.getPwd().getBytes(), userDO.getSecret());
             if (cryptPwd.equals(userDO.getPwd())) {
                 // login success, generate token TODO
-                return null;
+                LoginUser loginUser = new LoginUser();
+                BeanUtils.copyProperties(userDO, loginUser);
+                String accessToken = JWTUtil.geneJsonWebToken(loginUser);
+                // accesstoken
+                // accesstoken expiration time
+                // uuid generate refresh token for 30 days
+//                String refreshToken = CommonUtil.generateUUID();
+//                redisTemplate.opsForValue().set(refreshToken, "1", 1000 * 60 * 60 * 24 * 30);
+
+                return JsonData.buildSuccess(accessToken);
             } else {
                 // password wrong
                 return JsonData.buildResult(BizCodeEnum.ACCOUNT_PWD_ERROR);

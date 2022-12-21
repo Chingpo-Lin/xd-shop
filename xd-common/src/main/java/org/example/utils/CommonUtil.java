@@ -1,12 +1,19 @@
 package org.example.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.util.Random;
 import java.util.UUID;
 
+@Slf4j
 public class CommonUtil {
 
     /**
@@ -119,5 +126,22 @@ public class CommonUtil {
             saltString.append(ALL_CHAR_NUM.charAt(random.nextInt(ALL_CHAR_NUM.length())));
         }
         return saltString.toString();
+    }
+
+    /**
+     * response Json data to frontend
+     * @param response
+     * @param obj
+     */
+    public static void sendJsonMessage(HttpServletResponse response, Object obj) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        response.setContentType("application/json; chartset=utf-8");
+
+        try (PrintWriter writer = response.getWriter()) { // auto close in jdk8
+            writer.print(objectMapper.writeValueAsString(obj));
+            response.flushBuffer();
+        } catch (IOException e) {
+            log.warn("error when respond json to frontend:{}", e);
+        }
     }
 }
