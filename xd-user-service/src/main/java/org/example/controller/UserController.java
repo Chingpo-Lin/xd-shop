@@ -10,6 +10,7 @@ import org.example.request.UserRegisterRequest;
 import org.example.service.FileService;
 import org.example.service.UserService;
 import org.example.utils.JsonData;
+import org.example.vo.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,6 +78,17 @@ public class UserController {
     public JsonData login(@ApiParam("user login object") @RequestBody UserLoginRequest userLoginRequest) {
         JsonData jsonData = userService.login(userLoginRequest);
         return jsonData;
+    }
+
+    /**
+     * detail of current login user
+     * @return
+     */
+    @ApiOperation("individual information check")
+    @GetMapping("detail")
+    public JsonData detail() {
+        UserVO userVO = userService.findUserDetail();
+        return JsonData.buildSuccess(userVO);
     }
 
 //    /**

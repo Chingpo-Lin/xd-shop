@@ -1,15 +1,13 @@
-package org.example.model;
+package org.example.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
-public class LoginUser {
+public class UserVO {
 
     /**
-     * key
+     * user id
      */
     private Long id;
 
@@ -25,7 +23,23 @@ public class LoginUser {
     private String headImg;
 
     /**
-     * mail
+     * sign
+     */
+    private String slogan;
+
+    /**
+     * 0 is female，1 is male
+     */
+    private Integer sex;
+
+    /**
+     * point
+     */
+    private Integer points;
+
+    /**
+     * email
      */
     private String mail;
+
 }
