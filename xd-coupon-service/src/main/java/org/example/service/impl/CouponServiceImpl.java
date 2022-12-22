@@ -10,6 +10,7 @@ import org.example.model.CouponDO;
 import org.example.mapper.CouponMapper;
 import org.example.service.CouponService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.example.utils.JsonData;
 import org.example.vo.CouponVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,17 @@ public class CouponServiceImpl implements CouponService {
         }).collect(Collectors.toList()));
 
         return pageMap;
+    }
+
+    /**
+     * add coupon
+     * @param couponId
+     * @param category
+     * @return
+     */
+    @Override
+    public JsonData addCoupon(long couponId, CouponCategoryEnum category) {
+        return JsonData.buildSuccess();
     }
 
     private CouponVO beanProcess(CouponDO couponDO) {
