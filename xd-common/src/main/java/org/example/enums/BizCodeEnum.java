@@ -30,6 +30,15 @@ public enum BizCodeEnum {
     ACCOUNT_NOT_LOGIN(250004,"account not login"),
 
     /**
+     * coupon
+     */
+    COUPON_NOT_EXIST(260001, "coupon not exist"),
+    COUPON_NO_STOCK(260002, "coupon no stock"),
+    COUPON_OUT_OF_TIME(260003, "coupon out of time"),
+    COUPON_OUT_OF_LIMIT(260004, "coupon out of limit"),
+    COUPON_GET_FAIL(260004, "coupon out of limit"),
+
+    /**
      * address
      */
     ADDRESS_NOT_EXIST(290001, "address not exist"),
