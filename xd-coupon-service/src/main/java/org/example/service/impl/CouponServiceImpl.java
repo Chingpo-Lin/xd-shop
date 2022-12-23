@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.Arrays;
@@ -92,6 +94,7 @@ public class CouponServiceImpl implements CouponService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public JsonData addCoupon(long couponId, CouponCategoryEnum category) {
 
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
@@ -100,6 +103,8 @@ public class CouponServiceImpl implements CouponService {
         RLock rLock = redissonClient.getLock(lockKey);
         // multiple thread enter will stop and release lock
         rLock.lock();
+        // lock with 10s expire time, but give up default watchdog function
+//        rLock.lock(10, TimeUnit.SECONDS);
 //        // comment part is use lua + redis, but we use redisson + redis to improve
 //        String uuid = CommonUtil.generateUUID();
 //        String lockKey = "lock:coupon:" + couponId;
@@ -108,6 +113,14 @@ public class CouponServiceImpl implements CouponService {
 //        if (lockFlag) {
         // lock success
         log.info("add coupon lock success:{}", Thread.currentThread().getId());
+
+//        // test watchdog of redisson auto extend ttl of redis key
+//        try {
+//            TimeUnit.SECONDS.sleep(90);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         try {
             // logic
             CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
