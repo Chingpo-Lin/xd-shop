@@ -104,9 +104,9 @@ public class CouponServiceImpl implements CouponService {
         couponRecordDO.setId(null); // beanutils will copy coupon id to here which is wrong
 
         // minus stock TODO
-//        int rows = couponMapper.reduceStock(couponId);
+        int rows = couponMapper.reduceStock(couponId);
 
-        if (true) {
+        if (rows == 1) {
             // save when success deduct stock
             couponRecordMapper.insert(couponRecordDO);
         } else {
