@@ -20,6 +20,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.utils.CommonUtil;
 import org.example.utils.JsonData;
 import org.example.vo.CouponVO;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -56,6 +58,9 @@ public class CouponServiceImpl implements CouponService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
     @Override
     public Map<String, Object> pageCouponActivity(int page, int size) {
 
@@ -91,66 +96,72 @@ public class CouponServiceImpl implements CouponService {
 
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
 
-        String uuid = CommonUtil.generateUUID();
         String lockKey = "lock:coupon:" + couponId;
-        Boolean lockFlag = redisTemplate.opsForValue().setIfAbsent(lockKey, uuid, Duration.ofMinutes(10));
+        RLock rLock = redissonClient.getLock(lockKey);
+        // multiple thread enter will stop and release lock
+        rLock.lock();
+//        // comment part is use lua + redis, but we use redisson + redis to improve
+//        String uuid = CommonUtil.generateUUID();
+//        String lockKey = "lock:coupon:" + couponId;
+//        Boolean lockFlag = redisTemplate.opsForValue().setIfAbsent(lockKey, uuid, Duration.ofMinutes(10));
 
-        if (lockFlag) {
-            // lock success
-            log.info("lock success:{}", couponId);
-            try {
-                // logic
-                CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
-                        .eq("id", couponId)
-                        .eq("category", category.name())
-                        .eq("publish", CouponPublishEnum.PUBLISH));
+//        if (lockFlag) {
+        // lock success
+        log.info("add coupon lock success:{}", Thread.currentThread().getId());
+        try {
+            // logic
+            CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
+                    .eq("id", couponId)
+                    .eq("category", category.name())
+                    .eq("publish", CouponPublishEnum.PUBLISH));
 
-                if (couponDO == null) {
-                    throw new BizException(BizCodeEnum.COUPON_NOT_EXIST);
-                }
+            if (couponDO == null) {
+                throw new BizException(BizCodeEnum.COUPON_NOT_EXIST);
+            }
 
-                // check if coupon can be added
-                checkCoupon(couponDO, loginUser.getId());
+            // check if coupon can be added
+            checkCoupon(couponDO, loginUser.getId());
 
-                // create coupon record
-                CouponRecordDO couponRecordDO = new CouponRecordDO();
-                BeanUtils.copyProperties(couponDO, couponRecordDO);
-                couponRecordDO.setCreateTime(new Date());
-                couponRecordDO.setUseState(CouponStateEnum.NEW.name());
-                couponRecordDO.setUserId(loginUser.getId());
-                couponRecordDO.setUserName(loginUser.getName());
-                couponRecordDO.setCouponId(couponId);
-                couponRecordDO.setId(null); // beanutils will copy coupon id to here which is wrong
+            // create coupon record
+            CouponRecordDO couponRecordDO = new CouponRecordDO();
+            BeanUtils.copyProperties(couponDO, couponRecordDO);
+            couponRecordDO.setCreateTime(new Date());
+            couponRecordDO.setUseState(CouponStateEnum.NEW.name());
+            couponRecordDO.setUserId(loginUser.getId());
+            couponRecordDO.setUserName(loginUser.getName());
+            couponRecordDO.setCouponId(couponId);
+            couponRecordDO.setId(null); // beanutils will copy coupon id to here which is wrong
 
-                // minus stock
-                int rows = couponMapper.reduceStock(couponId);
+            // minus stock
+            int rows = couponMapper.reduceStock(couponId);
 
-                if (rows == 1) {
-                    // save when success deduct stock
-                    couponRecordMapper.insert(couponRecordDO);
-                } else {
-                    log.warn("fail to get coupon:{}, user:{}", couponId, loginUser);
-                    throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
-                }
-            } finally {
+            if (rows == 1) {
+                // save when success deduct stock
+                couponRecordMapper.insert(couponRecordDO);
+            } else {
+                log.warn("fail to get coupon:{}, user:{}", couponId, loginUser);
+                throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
+            }
+        } finally {
+            rLock.unlock();
                 // script can ensure atomic since get and del success together
-                String script = "if redis.call('get',KEYS[1]) == ARGV[1]" +
-                        " then return redis.call('del',KEYS[1])" +
-                        " else return 0 end";
-
-                Integer result = redisTemplate.execute(new DefaultRedisScript<>(script, Integer.class),
-                        Arrays.asList(lockKey), uuid);
-            }
-
-        } else {
-            // lock fail
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                log.error("fail to recursion");
-            }
-            addCoupon(couponId, category);
+//                String script = "if redis.call('get',KEYS[1]) == ARGV[1]" +
+//                        " then return redis.call('del',KEYS[1])" +
+//                        " else return 0 end";
+//
+//                Integer result = redisTemplate.execute(new DefaultRedisScript<>(script, Integer.class),
+//                        Arrays.asList(lockKey), uuid);
         }
+
+//        } else {
+            // lock fail
+//            try {
+//                TimeUnit.SECONDS.sleep(1);
+//            } catch (InterruptedException e) {
+//                log.error("fail to recursion");
+//            }
+//            addCoupon(couponId, category);
+//        }
         return JsonData.buildSuccess();
     }
 
