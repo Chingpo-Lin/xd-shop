@@ -125,6 +125,14 @@
                 <artifactId>jjwt</artifactId>
                 <version>0.7.0</version>
             </dependency>
+
+            <!-- redisson distributed lock -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson</artifactId>
+                <version>3.10.1</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

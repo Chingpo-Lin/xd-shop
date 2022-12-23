@@ -22,11 +22,16 @@ import org.example.utils.JsonData;
 import org.example.vo.CouponVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +52,9 @@ public class CouponServiceImpl implements CouponService {
 
     @Autowired
     private CouponRecordMapper couponRecordMapper;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Override
     public Map<String, Object> pageCouponActivity(int page, int size) {
@@ -80,40 +88,69 @@ public class CouponServiceImpl implements CouponService {
      */
     @Override
     public JsonData addCoupon(long couponId, CouponCategoryEnum category) {
+
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
-        CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
-                .eq("id", couponId)
-                .eq("category", category.name())
-                .eq("publish", CouponPublishEnum.PUBLISH));
 
-        if (couponDO == null) {
-            throw new BizException(BizCodeEnum.COUPON_NOT_EXIST);
-        }
+        String uuid = CommonUtil.generateUUID();
+        String lockKey = "lock:coupon:" + couponId;
+        Boolean lockFlag = redisTemplate.opsForValue().setIfAbsent(lockKey, uuid, Duration.ofMinutes(10));
 
-        // check if coupon can be added
-        checkCoupon(couponDO, loginUser.getId());
+        if (lockFlag) {
+            // lock success
+            log.info("lock success:{}", couponId);
+            try {
+                // logic
+                CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
+                        .eq("id", couponId)
+                        .eq("category", category.name())
+                        .eq("publish", CouponPublishEnum.PUBLISH));
 
-        // create coupon record
-        CouponRecordDO couponRecordDO = new CouponRecordDO();
-        BeanUtils.copyProperties(couponDO, couponRecordDO);
-        couponRecordDO.setCreateTime(new Date());
-        couponRecordDO.setUseState(CouponStateEnum.NEW.name());
-        couponRecordDO.setUserId(loginUser.getId());
-        couponRecordDO.setUserName(loginUser.getName());
-        couponRecordDO.setCouponId(couponId);
-        couponRecordDO.setId(null); // beanutils will copy coupon id to here which is wrong
+                if (couponDO == null) {
+                    throw new BizException(BizCodeEnum.COUPON_NOT_EXIST);
+                }
 
-        // minus stock TODO
-        int rows = couponMapper.reduceStock(couponId);
+                // check if coupon can be added
+                checkCoupon(couponDO, loginUser.getId());
 
-        if (rows == 1) {
-            // save when success deduct stock
-            couponRecordMapper.insert(couponRecordDO);
+                // create coupon record
+                CouponRecordDO couponRecordDO = new CouponRecordDO();
+                BeanUtils.copyProperties(couponDO, couponRecordDO);
+                couponRecordDO.setCreateTime(new Date());
+                couponRecordDO.setUseState(CouponStateEnum.NEW.name());
+                couponRecordDO.setUserId(loginUser.getId());
+                couponRecordDO.setUserName(loginUser.getName());
+                couponRecordDO.setCouponId(couponId);
+                couponRecordDO.setId(null); // beanutils will copy coupon id to here which is wrong
+
+                // minus stock
+                int rows = couponMapper.reduceStock(couponId);
+
+                if (rows == 1) {
+                    // save when success deduct stock
+                    couponRecordMapper.insert(couponRecordDO);
+                } else {
+                    log.warn("fail to get coupon:{}, user:{}", couponId, loginUser);
+                    throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
+                }
+            } finally {
+                // script can ensure atomic since get and del success together
+                String script = "if redis.call('get',KEYS[1]) == ARGV[1]" +
+                        " then return redis.call('del',KEYS[1])" +
+                        " else return 0 end";
+
+                Integer result = redisTemplate.execute(new DefaultRedisScript<>(script, Integer.class),
+                        Arrays.asList(lockKey), uuid);
+            }
+
         } else {
-            log.warn("fail to get coupon:{}, user:{}", couponId, loginUser);
-            throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
+            // lock fail
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                log.error("fail to recursion");
+            }
+            addCoupon(couponId, category);
         }
-
         return JsonData.buildSuccess();
     }
 
