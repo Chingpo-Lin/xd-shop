@@ -15,6 +15,7 @@ import org.example.model.CouponDO;
 import org.example.mapper.CouponMapper;
 import org.example.model.CouponRecordDO;
 import org.example.model.LoginUser;
+import org.example.request.NewUserCouponRequest;
 import org.example.service.CouponService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.utils.CommonUtil;
@@ -31,10 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -175,6 +173,33 @@ public class CouponServiceImpl implements CouponService {
 //            }
 //            addCoupon(couponId, category);
 //        }
+        return JsonData.buildSuccess();
+    }
+
+    /**
+     * user microservice will not pass token, so do not intercept
+     * @param newUserCouponRequest
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public JsonData initNewUserCoupon(NewUserCouponRequest newUserCouponRequest) {
+        LoginUser loginUser = new LoginUser();
+        loginUser.setId(newUserCouponRequest.getUserId());
+        loginUser.setName(newUserCouponRequest.getName());
+        LoginInterceptor.threadLocal.set(loginUser);
+
+        log.info("user id is set as:{}", loginUser.getId());
+
+        // new user coupon
+        List<CouponDO> couponDOList = couponMapper.selectList(new QueryWrapper<CouponDO>()
+                .eq("category", CouponCategoryEnum.NEW_USER.name()));
+
+        for (CouponDO couponDO: couponDOList) {
+            //
+            this.addCoupon(couponDO.getId(), CouponCategoryEnum.NEW_USER);
+        }
+
         return JsonData.buildSuccess();
     }
 

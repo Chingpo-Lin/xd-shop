@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.example.enums.CouponCategoryEnum;
+import org.example.request.NewUserCouponRequest;
 import org.example.service.CouponService;
 import org.example.utils.JsonData;
 import org.redisson.api.RLock;
@@ -73,6 +74,16 @@ public class CouponController {
         }
 
         return JsonData.buildSuccess();
+    }
+
+    @ApiOperation("RPC-new user register")
+    @PostMapping("new_user_coupon")
+    public JsonData addNewUserCoupon(
+            @ApiParam("new user coupon object")
+            @RequestBody NewUserCouponRequest newUserCouponRequest) {
+
+        JsonData jsonData = couponService.initNewUserCoupon(newUserCouponRequest);
+        return jsonData;
     }
 }
 
