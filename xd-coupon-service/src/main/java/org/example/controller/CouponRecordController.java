@@ -4,14 +4,12 @@ package org.example.controller;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.example.enums.BizCodeEnum;
 import org.example.service.CouponRecordService;
 import org.example.utils.JsonData;
+import org.example.vo.CouponRecordVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -38,6 +36,18 @@ public class CouponRecordController {
 
         Map<String, Object> pageResult = couponRecordService.page(page, size);
         return JsonData.buildSuccess(pageResult);
+    }
+
+    @ApiOperation("find coupon detail")
+    @GetMapping("detail/{record_id}")
+    public JsonData getCouponRecordDetail(
+            @ApiParam(value = "record id")
+            @PathVariable("record_id") long recordId) {
+
+        CouponRecordVO couponRecordVO = couponRecordService.findById(recordId);
+
+        return couponRecordVO == null ? JsonData.buildResult(BizCodeEnum.COUPON_NOT_EXIST) : JsonData.buildSuccess(couponRecordVO);
+
     }
 }
 

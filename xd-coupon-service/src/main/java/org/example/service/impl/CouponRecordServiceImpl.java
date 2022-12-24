@@ -63,6 +63,19 @@ public class CouponRecordServiceImpl implements CouponRecordService {
         return pageMap;
     }
 
+    @Override
+    public CouponRecordVO findById(long recordId) {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+
+        CouponRecordDO couponRecordDO = couponRecordMapper.selectOne(new QueryWrapper<CouponRecordDO>()
+                .eq("id", recordId).eq("user_id", loginUser.getId()));
+
+        if (couponRecordDO == null) {
+            return null;
+        }
+        return beanProcess(couponRecordDO);
+    }
+
     private CouponRecordVO beanProcess(CouponRecordDO couponRecordDO) {
         CouponRecordVO couponRecordVO = new CouponRecordVO();
         BeanUtils.copyProperties(couponRecordDO, couponRecordVO);

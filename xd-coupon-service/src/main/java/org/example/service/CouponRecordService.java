@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.model.CouponRecordDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.example.vo.CouponRecordVO;
 
 import java.util.Map;
 
@@ -23,4 +24,10 @@ public interface CouponRecordService {
      */
     Map<String, Object> page(int page, int size);
 
+    /**
+     * find detail by record id
+     * @param recordId
+     * @return
+     */
+    CouponRecordVO findById(long recordId);
 }
