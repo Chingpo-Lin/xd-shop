@@ -5,6 +5,11 @@ server:
 spring:
   application:
     name: xd-product-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 120.24.94.91:8848
+
   # database config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
