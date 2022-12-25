@@ -39,6 +39,11 @@ public enum BizCodeEnum {
     COUPON_GET_FAIL(260004, "coupon out of limit"),
 
     /**
+     * cart
+     */
+    CART_FAIL(270001, "add to cart fail"),
+
+    /**
      * address
      */
     ADDRESS_NOT_EXIST(290001, "address not exist"),
