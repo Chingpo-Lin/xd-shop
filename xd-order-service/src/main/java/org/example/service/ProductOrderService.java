@@ -2,6 +2,8 @@ package org.example.service;
 
 import org.example.model.ProductOrderDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.example.request.ConfirmOrderRequest;
+import org.example.utils.JsonData;
 
 /**
  * <p>
@@ -13,4 +15,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ProductOrderService {
 
+    /**
+     * create order
+     * @param confirmOrderRequest
+     * @return
+     */
+    JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest);
 }
