@@ -6,10 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.example.enums.BizCodeEnum;
 import org.example.enums.SendCodeEnum;
+import org.example.feign.CouponFeignService;
 import org.example.interceptor.LoginInterceptor;
 import org.example.mapper.UserMapper;
 import org.example.model.LoginUser;
 import org.example.model.UserDO;
+import org.example.request.NewUserCouponRequest;
 import org.example.request.UserLoginRequest;
 import org.example.request.UserRegisterRequest;
 import org.example.service.NotifyService;
@@ -31,6 +33,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private CouponFeignService couponFeignService;
 
     @Autowired
     private NotifyService notifyService;
@@ -162,5 +167,11 @@ public class UserServiceImpl implements UserService {
      */
     private void userRegisterInitTask(UserDO userDO) {
 
+        NewUserCouponRequest request = new NewUserCouponRequest();
+        request.setName(userDO.getName());
+        request.setUserId(userDO.getId());
+        JsonData jsonData = couponFeignService.addNewUserCoupon(request);
+        log.info("distribute new user register coupon: {}, result: {}",
+                request.toString(), jsonData.toString());
     }
 }
