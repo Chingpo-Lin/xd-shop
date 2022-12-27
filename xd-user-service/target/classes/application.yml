@@ -50,3 +50,12 @@ aliyun:
     access-key-id: LTAI5tDy8ikYc6zeLveoUhce
     access-key-secret: N891ThTNJJYoXaOz5TmV7MGOeUgTjJ
     bucket-name: bob-xdshop-img
+
+# seata config
+seata:
+  tx-service-group: ${spring.application.name}-group
+  service:
+    grouplist:
+      xdbob: 127.0.0.1:8091
+    vgroup-mapping:
+      xd-user-service-group: xdbob

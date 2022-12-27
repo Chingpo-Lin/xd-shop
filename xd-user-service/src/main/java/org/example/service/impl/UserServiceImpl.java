@@ -1,6 +1,7 @@
 package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.seata.spring.annotation.GlobalTransactional;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
@@ -25,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -58,6 +61,8 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+//    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @GlobalTransactional
     public JsonData register(UserRegisterRequest registerRequest) {
 
         boolean checkCode = false;
@@ -172,6 +177,9 @@ public class UserServiceImpl implements UserService {
         request.setName(userDO.getName());
         request.setUserId(userDO.getId());
         JsonData jsonData = couponFeignService.addNewUserCoupon(request);
+        if (jsonData.getCode() != 0) {
+            throw new RuntimeException("error when allocate coupon");
+        }
         log.info("distribute new user register coupon: {}, result: {}",
                 request.toString(), jsonData.toString());
     }
