@@ -161,6 +161,7 @@ public class UserServiceImpl implements UserService {
         List<UserDO> list = userMapper.selectList(queryWrapper);
         return list.size() == 0;
     }
+
      /**
      * initilize new user info
      * @param userDO
