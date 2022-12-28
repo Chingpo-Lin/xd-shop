@@ -1,15 +1,18 @@
 package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.seata.spring.annotation.GlobalTransactional;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.example.enums.BizCodeEnum;
 import org.example.enums.SendCodeEnum;
+import org.example.feign.CouponFeignService;
 import org.example.interceptor.LoginInterceptor;
 import org.example.mapper.UserMapper;
 import org.example.model.LoginUser;
 import org.example.model.UserDO;
+import org.example.request.NewUserCouponRequest;
 import org.example.request.UserLoginRequest;
 import org.example.request.UserRegisterRequest;
 import org.example.service.NotifyService;
@@ -23,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
@@ -31,6 +36,9 @@ import java.util.List;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
+
+    @Autowired
+    private CouponFeignService couponFeignService;
 
     @Autowired
     private NotifyService notifyService;
@@ -53,6 +61,9 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    // generally do not use it here since if coupon error, we don't want to rollback register
+//    @GlobalTransactional
     public JsonData register(UserRegisterRequest registerRequest) {
 
         boolean checkCode = false;
@@ -156,11 +167,21 @@ public class UserServiceImpl implements UserService {
         List<UserDO> list = userMapper.selectList(queryWrapper);
         return list.size() == 0;
     }
+
      /**
      * initilize new user info
      * @param userDO
      */
     private void userRegisterInitTask(UserDO userDO) {
 
+        NewUserCouponRequest request = new NewUserCouponRequest();
+        request.setName(userDO.getName());
+        request.setUserId(userDO.getId());
+        JsonData jsonData = couponFeignService.addNewUserCoupon(request);
+        if (jsonData.getCode() != 0) {
+            throw new RuntimeException("error when allocate coupon");
+        }
+        log.info("distribute new user register coupon: {}, result: {}",
+                request.toString(), jsonData.toString());
     }
 }

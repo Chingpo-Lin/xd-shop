@@ -10,6 +10,18 @@ spring:
       discovery:
         server-addr: 120.24.94.91:8848
 
+  # rabbit mq config
+  rabbitmq:
+    host: 120.24.94.91
+    port: 5672
+    virtual-host: /
+    password: password
+    username: admin
+    # manually confirm msg
+    listener:
+      simple:
+        acknowledge-mode: manual
+
   # database config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -31,3 +43,12 @@ mybatis-plus:
 logging:
   level:
     root: INFO
+
+# seata config
+#seata:
+#  tx-service-group: ${spring.application.name}-group
+#  service:
+#    grouplist:
+#      xdbob: 127.0.0.1:8091
+#    vgroup-mapping:
+#      xd-coupon-service-group: xdbob
