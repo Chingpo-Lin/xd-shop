@@ -2,6 +2,8 @@ package org.example.service;
 
 import org.example.model.CouponRecordDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.example.request.LockCouponRecordRequest;
+import org.example.utils.JsonData;
 import org.example.vo.CouponRecordVO;
 
 import java.util.Map;
@@ -30,4 +32,11 @@ public interface CouponRecordService {
      * @return
      */
     CouponRecordVO findById(long recordId);
+
+    /**
+     * lock coupon
+     * @param recordRequest
+     * @return
+     */
+    JsonData lockCouponRecords(LockCouponRecordRequest recordRequest);
 }

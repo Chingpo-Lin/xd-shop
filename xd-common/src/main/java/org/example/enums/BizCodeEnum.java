@@ -37,6 +37,7 @@ public enum BizCodeEnum {
     COUPON_OUT_OF_TIME(260003, "coupon out of time"),
     COUPON_OUT_OF_LIMIT(260004, "coupon out of limit"),
     COUPON_GET_FAIL(260004, "coupon out of limit"),
+    COUPON_RECORD_LOCK_FAIL(26005, "coupon record lock fail"),
 
     /**
      * cart

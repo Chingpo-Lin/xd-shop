@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.example.enums.BizCodeEnum;
+import org.example.request.LockCouponRecordRequest;
 import org.example.service.CouponRecordService;
 import org.example.utils.JsonData;
 import org.example.vo.CouponRecordVO;
@@ -48,6 +49,16 @@ public class CouponRecordController {
 
         return couponRecordVO == null ? JsonData.buildResult(BizCodeEnum.COUPON_NOT_EXIST) : JsonData.buildSuccess(couponRecordVO);
 
+    }
+
+    @ApiOperation("rpc lock coupon record")
+    @PostMapping("lock_records")
+    public JsonData lockCouponRecords(
+            @ApiParam("lock coupon request object")
+            @RequestBody LockCouponRecordRequest recordRequest) {
+
+        JsonData jsonData = couponRecordService.lockCouponRecords(recordRequest);
+        return jsonData;
     }
 }
 
