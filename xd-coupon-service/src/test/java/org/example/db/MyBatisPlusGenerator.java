@@ -65,7 +65,7 @@ public class MyBatisPlusGenerator {
 
                 // generate table, suport multiple tables in array
                 //TODO  TODO  TODO  TODO
-                .setInclude("coupon","coupon_record");
+                .setInclude("coupon_task");
 
         //4. package naming strategy
         PackageConfig pkConfig = new PackageConfig();

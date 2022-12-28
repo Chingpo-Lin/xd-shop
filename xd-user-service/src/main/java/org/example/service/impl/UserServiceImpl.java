@@ -61,8 +61,9 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-//    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-    @GlobalTransactional
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    // generally do not use it here since if coupon error, we don't want to rollback register
+//    @GlobalTransactional
     public JsonData register(UserRegisterRequest registerRequest) {
 
         boolean checkCode = false;
