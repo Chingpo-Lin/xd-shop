@@ -60,7 +60,7 @@ public class CouponMQListener {
             log.error("release coupon record error:{}, msg:{}", e, recordMessage);
             channel.basicReject(msgTag, true);
         } finally {
-
+            lock.unlock();
         }
     }
 }
