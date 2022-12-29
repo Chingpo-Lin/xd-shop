@@ -1,5 +1,6 @@
 package org.example.config;
 
+import lombok.Data;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@Data
 public class RabbitMQConfig {
 
     /**

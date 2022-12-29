@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.example.config.RabbitMQConfig;
 import org.example.enums.BizCodeEnum;
 import org.example.enums.CouponStateEnum;
 import org.example.enums.StockTaskStateEnum;
@@ -12,6 +13,7 @@ import org.example.interceptor.LoginInterceptor;
 import org.example.mapper.CouponTaskMapper;
 import org.example.model.CouponRecordDO;
 import org.example.mapper.CouponRecordMapper;
+import org.example.model.CouponRecordMessage;
 import org.example.model.CouponTaskDO;
 import org.example.model.LoginUser;
 import org.example.request.LockCouponRecordRequest;
@@ -19,6 +21,7 @@ import org.example.service.CouponRecordService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.utils.JsonData;
 import org.example.vo.CouponRecordVO;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +50,12 @@ public class CouponRecordServiceImpl implements CouponRecordService {
 
     @Autowired
     private CouponTaskMapper couponTaskMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
     /**
      * paging
@@ -122,7 +131,17 @@ public class CouponRecordServiceImpl implements CouponRecordService {
         log.info("coupon record lock insertRows={}", insertRows);
 
         if (lockCouponRecordIds.size() == insertRows && insertRows == updateRows) {
-            // send delay msg TODO
+            for (CouponTaskDO couponTaskDO: couponTaskDOList) {
+                CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
+                couponRecordMessage.setOutTradeNo(couponTaskDO.getOutTradeNo());
+                couponRecordMessage.setTaskId(couponTaskDO.getId());
+
+                rabbitTemplate.convertAndSend(
+                        rabbitMQConfig.getEventExchange(),
+                        rabbitMQConfig.getCouponReleaseDelayRoutingKey(),
+                        couponRecordMessage);
+                log.info("coupon lock msg send success:{}", couponRecordMessage);
+            }
 
             return JsonData.buildSuccess();
         } else {
