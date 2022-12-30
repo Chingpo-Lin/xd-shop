@@ -43,3 +43,24 @@ mybatis-plus:
 logging:
   level:
     root: INFO
+
+
+# custom mq config，send lock stock msg->delay exchange->lock.queue->dead letter exchange->release.queue
+mqconfig:
+  #delay queue, cannot be listened and consume
+  stock_release_delay_queue: stock.release.delay.queue
+
+  #redirect queue after msg expire
+  stock_release_queue: stock.release.queue
+
+  #exchange
+  stock_event_exchange: stock.event.exchange
+
+  #routing key for enter delay queue
+  stock_release_delay_routing_key: stock.release.delay.routing.key
+
+  #msg expire，routing key for enter release queue
+  stock_release_routing_key: stock.release.routing.key
+
+  #msg expire time,ms, 15ms in test
+  ttl: 15000
