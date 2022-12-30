@@ -44,7 +44,12 @@ public enum BizCodeEnum {
      */
     CART_FAIL(270001, "add to cart fail"),
 
+    /**
+     * order
+     */
     ORDER_NOT_EXIST(280001, "order not exist"),
+    PRODUCT_LOCK_FAIL(280002, "product lock fail"),
+
     /**
      * address
      */
