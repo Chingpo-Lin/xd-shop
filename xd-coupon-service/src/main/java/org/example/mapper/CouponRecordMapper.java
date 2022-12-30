@@ -31,9 +31,9 @@ public interface CouponRecordMapper extends BaseMapper<CouponRecordDO> {
     /**
      * update coupon use state
      * @param couponRecordId
-     * @param name
+     * @param useState
      */
     void updateState(
             @Param("couponRecordId") Long couponRecordId,
-            @Param("name") String name);
+            @Param("useState") String useState);
 }
