@@ -2,6 +2,7 @@ package org.example.biz;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.ProductApplication;
+import org.example.model.ProductMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -24,8 +25,16 @@ public class MQTest {
                 "this is product stock lock msg");
     }
 
+    @Test
+    public void testSendProductStockMessage() {
+        ProductMessage productMessage = new ProductMessage();
+        productMessage.setOutTradeNo("123456abc");
+        productMessage.setTaskId(1L);
+        rabbitTemplate.convertAndSend("stock.event.exchange",
+                "stock.release.delay.routing.key", productMessage);
+    }
 //    @Test
-//    public void testCouponRecordRelease() {
+//    public void testRecordRelease() {
 //        CouponRecordMessage message = new CouponRecordMessage();
 //        message.setOutTradeNo("123456abc");
 //        message.setTaskId(1L);

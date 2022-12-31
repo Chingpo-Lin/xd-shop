@@ -165,7 +165,6 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public boolean releaseProductStock(ProductMessage productMessage) {
-
         ProductTaskDO productTaskDO = productTaskMapper.selectOne(new QueryWrapper<ProductTaskDO>()
                 .eq("id", productMessage.getTaskId()));
 
@@ -176,10 +175,13 @@ public class ProductServiceImpl implements ProductService {
         // handle only lock
         if (productTaskDO.getLockState().equalsIgnoreCase(StockTaskStateEnum.LOCK.name())) {
             // query order state
+            log.info("enter here:{}", productMessage.getOutTradeNo());
             JsonData jsonData = productOrderFeignService.queryProductOrderState(productMessage.getOutTradeNo());
-            String state = jsonData.getData().toString();
+            log.info("get data:{}", jsonData);
 
             if (jsonData.getCode() == 0) {
+                String state = jsonData.getData().toString();
+
                 if (state.equalsIgnoreCase(ProductOrderStateEnum.NEW.name())) {
                     log.warn("order is new, requeue, msg={}", productMessage);
                     return false;

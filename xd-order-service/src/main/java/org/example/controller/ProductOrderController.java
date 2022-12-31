@@ -46,8 +46,9 @@ public class ProductOrderController {
     public JsonData queryProductOrderState(
             @ApiParam("order number")
             @RequestParam("out_trade_no") String outTradeNo) {
+        log.info("query here with out trade no:{}", outTradeNo);
         String state = productOrderService.queryProductOrderState(outTradeNo);
-
+        log.info("query here with state:{}", state);
         return StringUtils.isEmpty(state) ? JsonData.buildResult(BizCodeEnum.ORDER_NOT_EXIST) : JsonData.buildSuccess(state);
     }
 

@@ -23,8 +23,8 @@ public class ProductStockMQListener {
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private RedissonClient redissonClient;
+//    @Autowired
+//    private RedissonClient redissonClient;
 
     /**
      * need to check:
@@ -47,11 +47,12 @@ public class ProductStockMQListener {
 
         // prevent same unlock task enter in concurrency
         // if parallel consume, don't need lock
-        Lock lock = redissonClient.getLock("lock:coupon_record_release:" + productMessage.getTaskId());
-        lock.lock();
+//        Lock lock = redissonClient.getLock("lock:coupon_record_release:" + productMessage.getTaskId());
+//        lock.lock();
 
         try {
             if (flag) {
+                log.info("handle msg:{}", productMessage);
                 channel.basicAck(msgTag, false);
             } else {
                 log.error("release product fail, flag=false, {}", productMessage);
@@ -60,8 +61,10 @@ public class ProductStockMQListener {
         } catch (IOException e) {
             log.error("release product error:{}, msg:{}", e, productMessage);
             channel.basicReject(msgTag, true);
-        } finally {
-            lock.unlock();
         }
+//        finally {
+//            lock.unlock();
+//        }
+
     }
 }
