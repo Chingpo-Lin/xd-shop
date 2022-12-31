@@ -1,10 +1,16 @@
 package org.example.config;
 
+import feign.RequestInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.interceptor.LoginInterceptor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Configuration
 @Slf4j
@@ -16,4 +22,5 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/coupon/*/**", "/api/coupon_record/*/**")
                 .excludePathPatterns("/api/coupon/*/page_coupon", "/api/coupon/*/new_user_coupon");
     }
+
 }
