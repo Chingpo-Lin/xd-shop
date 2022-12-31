@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.model.ProductDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.example.model.ProductMessage;
 import org.example.request.LockProductRequest;
 import org.example.utils.JsonData;
 import org.example.vo.ProductVO;
@@ -47,4 +48,11 @@ public interface ProductService {
      * @return
      */
     JsonData lockProductStock(LockProductRequest lockProductRequest);
+
+    /**
+     * release product stock
+     * @param productMessage
+     * @return
+     */
+    boolean releaseProductStock(ProductMessage productMessage);
 }

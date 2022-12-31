@@ -6,8 +6,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.example.config.RabbitMQConfig;
 import org.example.enums.BizCodeEnum;
+import org.example.enums.ProductOrderStateEnum;
 import org.example.enums.StockTaskStateEnum;
 import org.example.exception.BizException;
+
+import org.example.feign.ProductOrderFeignService;
 import org.example.mapper.ProductTaskMapper;
 import org.example.model.ProductDO;
 import org.example.mapper.ProductMapper;
@@ -16,7 +19,6 @@ import org.example.model.ProductTaskDO;
 import org.example.request.LockProductRequest;
 import org.example.request.OrderItemRequest;
 import org.example.service.ProductService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.utils.JsonData;
 import org.example.vo.ProductVO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -54,6 +56,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private RabbitMQConfig rabbitMQConfig;
+
+    @Autowired
+    private ProductOrderFeignService productOrderFeignService;
 
     /**
      * paging
@@ -151,6 +156,57 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         return JsonData.buildSuccess();
+    }
+
+    /**
+     * release product stock
+     * @param productMessage
+     * @return
+     */
+    @Override
+    public boolean releaseProductStock(ProductMessage productMessage) {
+
+        ProductTaskDO productTaskDO = productTaskMapper.selectOne(new QueryWrapper<ProductTaskDO>()
+                .eq("id", productMessage.getTaskId()));
+
+        if (productTaskDO == null) {
+            log.warn("task not exist:{}", productMessage);
+        }
+
+        // handle only lock
+        if (productTaskDO.getLockState().equalsIgnoreCase(StockTaskStateEnum.LOCK.name())) {
+            // query order state
+            JsonData jsonData = productOrderFeignService.queryProductOrderState(productMessage.getOutTradeNo());
+            String state = jsonData.getData().toString();
+
+            if (jsonData.getCode() == 0) {
+                if (state.equalsIgnoreCase(ProductOrderStateEnum.NEW.name())) {
+                    log.warn("order is new, requeue, msg={}", productMessage);
+                    return false;
+                }
+
+                if (state.equalsIgnoreCase(ProductOrderStateEnum.PAY.name())) {
+                    productTaskDO.setLockState(StockTaskStateEnum.FINISH.name());
+                    productTaskMapper.update(productTaskDO, new QueryWrapper<ProductTaskDO>().eq("id", productMessage.getTaskId()));
+                    log.warn("order is payed, change stock to FINISH, msg={}", productMessage);
+                    return true;
+                }
+            }
+
+            log.warn("order is cancel or not exist, change task to CANCEL, renew stock, message:{}", productMessage);
+            productTaskDO.setLockState(StockTaskStateEnum.CANCEL.name());
+            productTaskMapper.update(productTaskDO, new QueryWrapper<ProductTaskDO>()
+                    .eq("id", productMessage.getTaskId()));
+
+            // recover stock, lock stock - current buy num
+            productMapper.unlockProductStock(productTaskDO.getProductId(), productTaskDO.getBuyNum());
+;
+            return true;
+        } else {
+            // not lock
+            log.warn("order not lock, state={}, msg={}", productTaskDO.getLockState(), productMessage);
+        }
+        return true;
     }
 
     private ProductVO beanProcess(ProductDO productDO) {

@@ -21,9 +21,15 @@
     </sql>
 
     <!-- lock product stock -->
-    <update id="">
+    <update id="lockProductStock">
         UPDATE product set lock_stock = lock_stock + #{buyNum}
         where id = #{productId} and stock - lock_stock >= #{buyNum}
+    </update>
+
+    <!-- unlock product stock -->
+    <update id="unlockProductStock">
+        update product set lock_stock = lock_stock - #{buyNum}
+        where id = #{productId}
     </update>
 
 </mapper>
