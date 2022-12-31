@@ -1,6 +1,8 @@
 package org.example.utils;
 
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +27,19 @@ public class JsonData {
      * success
      * @return
      */
+
+    /**
+     * get feign call data
+     * notice:
+     *      support underline to camel
+     * @param typeReference
+     * @param <T>
+     * @return
+     */
+    public <T> T getData(TypeReference<T> typeReference) {
+        return JSON.parseObject(JSON.toJSONString(data), typeReference);
+    }
+
     public static JsonData buildSuccess() {
         return new JsonData(0, null, null);
     }

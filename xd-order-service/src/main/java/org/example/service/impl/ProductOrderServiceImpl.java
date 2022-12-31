@@ -1,12 +1,21 @@
 package org.example.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
+import org.example.enums.BizCodeEnum;
+import org.example.exception.BizException;
+import org.example.feign.UserFeignService;
+import org.example.interceptor.LoginInterceptor;
+import org.example.model.LoginUser;
 import org.example.model.ProductOrderDO;
 import org.example.mapper.ProductOrderMapper;
 import org.example.request.ConfirmOrderRequest;
 import org.example.service.ProductOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.example.utils.CommonUtil;
 import org.example.utils.JsonData;
+import org.example.vo.ProductOrderAddressVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +28,14 @@ import org.springframework.stereotype.Service;
  * @since 2022-12-25
  */
 @Service
+@Slf4j
 public class ProductOrderServiceImpl implements ProductOrderService {
 
     @Autowired
     private ProductOrderMapper productOrderMapper;
+
+    @Autowired
+    private UserFeignService userFeignService;
 
     /**
      * 1. check if submit order redundant
@@ -42,7 +55,35 @@ public class ProductOrderServiceImpl implements ProductOrderService {
      */
     @Override
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
+
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+
+        String orderOutTradeNo = CommonUtil.getStringNumRandom(32);
+
+        ProductOrderAddressVO addressVO = this.getUserAddress(confirmOrderRequest.getAddressId());
+
+        log.info("receive address info:{}", addressVO);
+
         return null;
+    }
+
+    /**
+     * get receive address detail
+     * @param addressId
+     * @return
+     */
+    private ProductOrderAddressVO getUserAddress(long addressId) {
+
+        JsonData addressData = userFeignService.detail(addressId);
+
+        if (addressData.getCode() != 0) {
+            log.error("get address fail");
+            throw new BizException(BizCodeEnum.ADDRESS_NOT_EXIST);
+        }
+
+        ProductOrderAddressVO addressVO = addressData.getData(new TypeReference<>(){});
+
+        return addressVO;
     }
 
     /**
