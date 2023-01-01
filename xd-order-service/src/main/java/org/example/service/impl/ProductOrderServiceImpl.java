@@ -1,19 +1,21 @@
 package org.example.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
-import org.example.enums.BizCodeEnum;
-import org.example.enums.CouponStateEnum;
+import org.example.enums.*;
 import org.example.exception.BizException;
 import org.example.feign.CouponFeignService;
 import org.example.feign.ProductFeignService;
 import org.example.feign.UserFeignService;
 import org.example.interceptor.LoginInterceptor;
+import org.example.mapper.ProductOrderItemMapper;
 import org.example.model.LoginUser;
 import org.example.model.ProductOrderDO;
 import org.example.mapper.ProductOrderMapper;
+import org.example.model.ProductOrderItemDO;
 import org.example.request.ConfirmOrderRequest;
 import org.example.request.LockCouponRecordRequest;
 import org.example.request.LockProductRequest;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +59,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @Autowired
+    private ProductOrderItemMapper orderItemMapper;
 
     /**
      * 1. check if submit order redundant
@@ -105,11 +111,77 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         // lock stock
         this.lockProductStocks(orderItemVOList, orderOutTradeNo);
 
-        // create order TODO
+        // create order
+        ProductOrderDO productOrderDO = this.saveProductOrder(confirmOrderRequest,
+                loginUser, orderOutTradeNo, addressVO);
+
+        // create order items
+        this.saveProductOrderItems(orderOutTradeNo, productOrderDO.getId(), orderItemVOList);
+
+        // send delay msg. used for auto close order TODO
+
+        // create payment TODO
 
         return JsonData.buildSuccess(addressVO);
     }
 
+    private void saveProductOrderItems(String orderOutTradeNo, Long orderId, List<OrderItemVO> orderItemVOList) {
+        List<ProductOrderItemDO> list = orderItemVOList.stream().map(obj -> {
+            ProductOrderItemDO itemDO = new ProductOrderItemDO();
+            itemDO.setBuyNum(obj.getCount());
+            itemDO.setProductId(obj.getProductId());
+            itemDO.setProductImg(obj.getProductImg());
+            itemDO.setProductName(obj.getProductTitle());
+
+            itemDO.setOutTradeNo(orderOutTradeNo);
+            itemDO.setCreateTime(new Date());
+
+            itemDO.setAmount(obj.getPrice());
+            itemDO.setTotalAmount(obj.getTotalPrice());
+            itemDO.setProductOrderId(orderId);
+            return itemDO;
+        }).collect(Collectors.toList());
+
+        orderItemMapper.insertBatch(list);
+
+    }
+
+    /**
+     * create order
+     * @param confirmOrderRequest
+     * @param loginUser
+     * @param orderOutTradeNo
+     * @param addressVO
+     */
+    private ProductOrderDO saveProductOrder(ConfirmOrderRequest confirmOrderRequest, LoginUser loginUser, String orderOutTradeNo, ProductOrderAddressVO addressVO) {
+        ProductOrderDO productOrderDO = new ProductOrderDO();
+        productOrderDO.setUserId(loginUser.getId());
+        productOrderDO.setHeadImg(loginUser.getHeadImg());
+        productOrderDO.setNickname(loginUser.getName());
+        productOrderDO.setOutTradeNo(orderOutTradeNo);
+        productOrderDO.setCreateTime(new Date());
+        productOrderDO.setDel(0);
+        productOrderDO.setOrderType(ProductOrderTypeEnum.DAILY.name());
+
+        // real pay amount
+        productOrderDO.setPayAmount(confirmOrderRequest.getRealPayPrice());
+
+        // total price without using coupon
+        productOrderDO.setTotalAmount(confirmOrderRequest.getTotalPrice());
+        productOrderDO.setState(ProductOrderStateEnum.NEW.name());
+        productOrderDO.setPayType(ProductOrderPayTypeEnum.valueOf(confirmOrderRequest.getPayType()).name());
+
+        productOrderDO.setReceiverAddress(JSON.toJSONString(addressVO));
+
+        productOrderMapper.insert(productOrderDO);
+        return productOrderDO;
+    }
+
+    /**
+     * lock product stock
+     * @param orderItemVOList
+     * @param orderOutTradeNo
+     */
     private void lockProductStocks(List<OrderItemVO> orderItemVOList, String orderOutTradeNo) {
         List<OrderItemRequest> itemRequestList = orderItemVOList.stream().map(obj -> {
 

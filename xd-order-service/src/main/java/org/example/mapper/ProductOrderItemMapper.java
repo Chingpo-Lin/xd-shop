@@ -1,7 +1,10 @@
 package org.example.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.example.model.ProductOrderItemDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProductOrderItemMapper extends BaseMapper<ProductOrderItemDO> {
 
+    /**
+     * insert order item
+     * @param list
+     */
+    void insertBatch(@Param("orderItemList") List<ProductOrderItemDO> list);
 }
