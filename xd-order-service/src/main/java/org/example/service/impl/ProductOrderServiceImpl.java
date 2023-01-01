@@ -15,6 +15,9 @@ import org.example.model.LoginUser;
 import org.example.model.ProductOrderDO;
 import org.example.mapper.ProductOrderMapper;
 import org.example.request.ConfirmOrderRequest;
+import org.example.request.LockCouponRecordRequest;
+import org.example.request.LockProductRequest;
+import org.example.request.OrderItemRequest;
 import org.example.service.ProductOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.example.utils.CommonUtil;
@@ -26,7 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -94,7 +99,58 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         // check price, minus coupon
         this.checkPrice(orderItemVOList, confirmOrderRequest);
 
+        // lock coupon
+        this.lockCouponRecords(confirmOrderRequest, orderOutTradeNo);
+
+        // lock stock
+        this.lockProductStocks(orderItemVOList, orderOutTradeNo);
+
+        // create order TODO
+
         return JsonData.buildSuccess(addressVO);
+    }
+
+    private void lockProductStocks(List<OrderItemVO> orderItemVOList, String orderOutTradeNo) {
+        List<OrderItemRequest> itemRequestList = orderItemVOList.stream().map(obj -> {
+
+            OrderItemRequest request = new OrderItemRequest();
+            request.setBuyNum(obj.getCount());
+            request.setProductId(obj.getProductId());
+            return request;
+
+        }).collect(Collectors.toList());
+
+        LockProductRequest lockProductRequest = new LockProductRequest();
+        lockProductRequest.setOrderOutTradeNo(orderOutTradeNo);
+        lockProductRequest.setOrderItemList(itemRequestList);
+
+        JsonData jsonData = productFeignService.lockProductStock(lockProductRequest);
+        if (jsonData.getCode() != 0) {
+            log.error("lock stock fail:{}", lockProductRequest);
+            throw new BizException(BizCodeEnum.ORDER_NOT_EXIST);
+        }
+    }
+
+    /**
+     * lock coupon
+     * @param confirmOrderRequest
+     * @param orderOutTradeNo
+     */
+    private void lockCouponRecords(ConfirmOrderRequest confirmOrderRequest, String orderOutTradeNo) {
+        List<Long> lockCouponRecordIds = new ArrayList<>();
+        if (confirmOrderRequest.getCouponRecordId() > 0) {
+            lockCouponRecordIds.add(confirmOrderRequest.getCouponRecordId());
+
+            LockCouponRecordRequest lockCouponRecordRequest = new LockCouponRecordRequest();
+            lockCouponRecordRequest.setOrderOutTradeNo(orderOutTradeNo);
+            lockCouponRecordRequest.setLockCouponRecordIds(lockCouponRecordIds);
+
+            // send lock request
+            JsonData jsonData = couponFeignService.lockCouponRecords(lockCouponRecordRequest);
+            if (jsonData.getCode() != 0) {
+                throw new BizException(BizCodeEnum.COUPON_GET_FAIL);
+            }
+        }
     }
 
     /**
