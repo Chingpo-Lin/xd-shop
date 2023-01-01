@@ -43,3 +43,11 @@ mybatis-plus:
 logging:
   level:
     root: INFO
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 60000
+        readTimeout: 10000
+

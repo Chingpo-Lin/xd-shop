@@ -49,6 +49,7 @@ public enum BizCodeEnum {
      */
     ORDER_NOT_EXIST(280001, "order not exist"),
     PRODUCT_LOCK_FAIL(280002, "product lock fail"),
+    ORDER_PRICE_FAIL(280003, "order price confirm fail"),
 
     /**
      * address

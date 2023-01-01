@@ -1,19 +1,29 @@
 package org.example.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
-/**
- * single item for cart
- */
-public class CartItemVO {
+public class OrderItemVO {
 
     /**
      * product id
      */
     @JsonProperty("product_id")
     private Long productId;
+
+    @Override
+    public String toString() {
+        return "OrderItemVO{" +
+                "productId=" + productId +
+                ", count=" + count +
+                ", productTitle='" + productTitle + '\'' +
+                ", productImg='" + productImg + '\'' +
+                ", price=" + price +
+                ", totalPrice=" + totalPrice +
+                '}';
+    }
 
     /**
      * product count
@@ -73,18 +83,6 @@ public class CartItemVO {
 
     public void setProductImg(String productImg) {
         this.productImg = productImg;
-    }
-
-    @Override
-    public String toString() {
-        return "CartItemVO{" +
-                "productId=" + productId +
-                ", count=" + count +
-                ", productTitle='" + productTitle + '\'' +
-                ", productImg='" + productImg + '\'' +
-                ", price=" + price +
-                ", totalPrice=" + totalPrice +
-                '}';
     }
 
     public BigDecimal getPrice() {

@@ -118,6 +118,32 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
+     * confirm cat product info
+     * @param productIdList
+     * @return
+     */
+    @Override
+    public List<CartItemVO> confirmOrderCartItems(List<Long> productIdList) {
+
+        // get all items in cart
+        List<CartItemVO> cartItemVOList = buildCartItem(true);
+
+        log.info("get cart item vo:{}", cartItemVOList);
+
+        // filter chosen items and clear
+        List<CartItemVO> resultList = cartItemVOList.stream().filter(obj -> {
+            if (productIdList.contains(obj.getProductId())) {
+                this.deleteItem(obj.getProductId());
+                return false;
+            }
+            return true;
+        }).collect(Collectors.toList());
+
+        log.info("get result list:{}", resultList);
+        return resultList;
+    }
+
+    /**
      * get latest item if need latest price
      * @param latestPrice
      * @return
