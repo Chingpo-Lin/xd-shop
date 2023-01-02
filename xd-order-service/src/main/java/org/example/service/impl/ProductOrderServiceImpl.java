@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
+import org.example.config.RabbitMQConfig;
 import org.example.enums.*;
 import org.example.exception.BizException;
 import org.example.feign.CouponFeignService;
@@ -13,6 +14,7 @@ import org.example.feign.UserFeignService;
 import org.example.interceptor.LoginInterceptor;
 import org.example.mapper.ProductOrderItemMapper;
 import org.example.model.LoginUser;
+import org.example.model.OrderMessage;
 import org.example.model.ProductOrderDO;
 import org.example.mapper.ProductOrderMapper;
 import org.example.model.ProductOrderItemDO;
@@ -27,6 +29,7 @@ import org.example.utils.JsonData;
 import org.example.vo.CouponRecordVO;
 import org.example.vo.OrderItemVO;
 import org.example.vo.ProductOrderAddressVO;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +65,12 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
     @Autowired
     private ProductOrderItemMapper orderItemMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RabbitMQConfig rabbitMQConfig;
 
     /**
      * 1. check if submit order redundant
@@ -118,7 +127,11 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         // create order items
         this.saveProductOrderItems(orderOutTradeNo, productOrderDO.getId(), orderItemVOList);
 
-        // send delay msg. used for auto close order TODO
+        // send delay msg. used for auto close order
+        OrderMessage orderMessage = new OrderMessage();
+        orderMessage.setOutTradeNo(orderOutTradeNo);
+
+        rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(), rabbitMQConfig.getOrderCloseDelayRoutingKey(), orderMessage);
 
         // create payment TODO
 
