@@ -44,7 +44,7 @@ public class AddressController {
 
     @ApiOperation("find address detail by id")
     @GetMapping("find/{address_id}")
-    public Object detail(
+    public JsonData detail(
             @ApiParam(value = "address id", required = true)
             @PathVariable("address_id") Long addressId) {
         AddressVO addressVO = addressService.detail(addressId);

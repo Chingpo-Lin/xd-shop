@@ -37,11 +37,19 @@ public enum BizCodeEnum {
     COUPON_OUT_OF_TIME(260003, "coupon out of time"),
     COUPON_OUT_OF_LIMIT(260004, "coupon out of limit"),
     COUPON_GET_FAIL(260004, "coupon out of limit"),
+    COUPON_RECORD_LOCK_FAIL(26005, "coupon record lock fail"),
 
     /**
      * cart
      */
     CART_FAIL(270001, "add to cart fail"),
+
+    /**
+     * order
+     */
+    ORDER_NOT_EXIST(280001, "order not exist"),
+    PRODUCT_LOCK_FAIL(280002, "product lock fail"),
+    ORDER_PRICE_FAIL(280003, "order price confirm fail"),
 
     /**
      * address

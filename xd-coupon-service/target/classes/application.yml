@@ -10,6 +10,18 @@ spring:
       discovery:
         server-addr: 120.24.94.91:8848
 
+  # rabbit mq config
+  rabbitmq:
+    host: 120.24.94.91
+    port: 5672
+    virtual-host: /
+    password: password
+    username: admin
+    # manually confirm msg
+    listener:
+      simple:
+        acknowledge-mode: manual
+
   # database config
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -40,3 +52,23 @@ logging:
 #      xdbob: 127.0.0.1:8091
 #    vgroup-mapping:
 #      xd-coupon-service-group: xdbob
+
+# custom mq config，send lock stock msg->delay exchange->lock.queue->dead letter exchange->release.queue
+mqconfig:
+  # delay queue, cannot be listen by consumer
+  coupon_release_delay_queue: coupon.release.delay.queue
+
+  # redirect queue after delay queue msg expired
+  coupon_release_queue: coupon.release.queue
+
+  # exchange
+  coupon_event_exchange: coupon.event.exchange
+
+  # routing key to enter delay queue
+  coupon_release_delay_routing_key: coupon.release.delay.routing.key
+
+  # msg expired ，key to enter released dead letter queue
+  coupon_release_routing_key: coupon.release.routing.key
+
+  # msg expire time in ms, 15s in testing environment
+  ttl: 15000

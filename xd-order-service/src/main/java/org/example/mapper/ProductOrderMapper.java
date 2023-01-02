@@ -1,5 +1,6 @@
 package org.example.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.example.model.ProductOrderDO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -13,4 +14,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProductOrderMapper extends BaseMapper<ProductOrderDO> {
 
+    /**
+     * update order state
+     * @param outTradeNo
+     * @param newState
+     * @param state
+     */
+    void updateOrderPayState(@Param("outTradeNo") String outTradeNo,
+                             @Param("newState") String newState,
+                             @Param("oldState") String state);
 }

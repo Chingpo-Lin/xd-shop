@@ -4,6 +4,7 @@ package org.example.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.example.request.LockProductRequest;
 import org.example.service.ProductService;
 import org.example.utils.JsonData;
 import org.example.vo.ProductVO;
@@ -46,6 +47,20 @@ public class ProductController {
 
         ProductVO productVO = productService.findProductById(productId);
         return JsonData.buildSuccess(productVO);
+    }
+
+    /**
+     * product stock lock
+     * @return
+     */
+    @ApiOperation("product stock lock")
+    @PostMapping("lock_product")
+    public JsonData lockProducts(
+            @ApiParam("product stock lock")
+            @RequestBody LockProductRequest lockProductRequest) {
+
+        JsonData jsonData = productService.lockProductStock(lockProductRequest);
+        return jsonData;
     }
 }
 

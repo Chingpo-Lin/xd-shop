@@ -20,4 +20,16 @@
         id, title, cover_img, detail, old_price, price, stock, create_time, lock_stock
     </sql>
 
+    <!-- lock product stock -->
+    <update id="lockProductStock">
+        UPDATE product set lock_stock = lock_stock + #{buyNum}
+        where id = #{productId} and stock - lock_stock >= #{buyNum}
+    </update>
+
+    <!-- unlock product stock -->
+    <update id="unlockProductStock">
+        update product set lock_stock = lock_stock - #{buyNum}
+        where id = #{productId}
+    </update>
+
 </mapper>

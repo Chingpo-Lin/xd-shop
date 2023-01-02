@@ -75,6 +75,18 @@ public class CartItemVO {
         this.productImg = productImg;
     }
 
+    @Override
+    public String toString() {
+        return "CartItemVO{" +
+                "productId=" + productId +
+                ", count=" + count +
+                ", productTitle='" + productTitle + '\'' +
+                ", productImg='" + productImg + '\'' +
+                ", price=" + price +
+                ", totalPrice=" + totalPrice +
+                '}';
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
