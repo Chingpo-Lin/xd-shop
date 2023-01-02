@@ -32,6 +32,7 @@ import org.example.vo.ProductOrderAddressVO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -346,6 +347,46 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             return "";
         } else {
             return productOrderDO.getState();
+        }
+    }
+
+    /**
+     * close order
+     * @param orderMessage
+     * @return
+     */
+    @Override
+    public boolean closeProductOrder(OrderMessage orderMessage) {
+
+        ProductOrderDO productOrderDO = productOrderMapper.selectOne(new QueryWrapper<ProductOrderDO>()
+                .eq("out_trade_no", orderMessage.getOutTradeNo()));
+
+        if (productOrderDO == null) {
+            // order not exist
+            log.warn("confirm since order not exist:{}", orderMessage);
+            return true;
+        }
+
+        if (productOrderDO.getState().equalsIgnoreCase(ProductOrderStateEnum.PAY.name())) {
+            log.info("confirm since order is paied", orderMessage);
+            return true;
+        }
+
+        // check payment status from payment platform (if fail to notify us)
+        String payResult = "";
+
+        // result is null means pay fail, cancel order
+        if (StringUtils.isEmpty(payResult)) {
+            productOrderMapper.updateOrderPayState(productOrderDO.getOutTradeNo(),
+                    ProductOrderStateEnum.CANCEL.name(), ProductOrderStateEnum.NEW.name());
+            log.info("result is empty, pay fail, cancel order", orderMessage);
+            return true;
+        } else {
+            // pay success, change state to pay
+            log.warn("pay success, but payment flatform redirect may fail");
+            productOrderMapper.updateOrderPayState(productOrderDO.getOutTradeNo(),
+                    ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
+            return true;
         }
     }
 }

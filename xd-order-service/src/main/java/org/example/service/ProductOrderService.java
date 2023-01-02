@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.model.OrderMessage;
 import org.example.model.ProductOrderDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.example.request.ConfirmOrderRequest;
@@ -28,4 +29,11 @@ public interface ProductOrderService {
      * @return
      */
     String queryProductOrderState(String outTradeNo);
+
+    /**
+     * listen close order
+     * @param orderMessage
+     * @return
+     */
+    boolean closeProductOrder(OrderMessage orderMessage);
 }
