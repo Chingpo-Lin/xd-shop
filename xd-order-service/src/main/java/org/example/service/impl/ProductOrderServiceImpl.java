@@ -5,6 +5,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
+import org.example.component.PayFactory;
 import org.example.config.RabbitMQConfig;
 import org.example.enums.*;
 import org.example.exception.BizException;
@@ -73,6 +74,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
     @Autowired
     private RabbitMQConfig rabbitMQConfig;
 
+    @Autowired
+    private PayFactory payFactory;
+
     /**
      * 1. check if submit order redundant
      * 2. check address belongs to current user
@@ -134,11 +138,18 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
         rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(), rabbitMQConfig.getOrderCloseDelayRoutingKey(), orderMessage);
 
-        // create payment TODO
+        // create payment
+        // payFactory.pay(null);
 
         return JsonData.buildSuccess(addressVO);
     }
 
+    /**
+     * save order item
+     * @param orderOutTradeNo
+     * @param orderId
+     * @param orderItemVOList
+     */
     private void saveProductOrderItems(String orderOutTradeNo, Long orderId, List<OrderItemVO> orderItemVOList) {
         List<ProductOrderItemDO> list = orderItemVOList.stream().map(obj -> {
             ProductOrderItemDO itemDO = new ProductOrderItemDO();
@@ -279,6 +290,11 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         }
     }
 
+    /**
+     * get cart coupon record
+     * @param couponRecordId
+     * @return
+     */
     private CouponRecordVO getCartCouponRecord(Long couponRecordId) {
         if (couponRecordId == null || couponRecordId < 0) {
             return null;
