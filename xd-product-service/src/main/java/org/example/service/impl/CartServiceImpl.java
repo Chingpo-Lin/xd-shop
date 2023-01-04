@@ -134,9 +134,9 @@ public class CartServiceImpl implements CartService {
         List<CartItemVO> resultList = cartItemVOList.stream().filter(obj -> {
             if (productIdList.contains(obj.getProductId())) {
                 this.deleteItem(obj.getProductId());
-                return false;
+                return true;
             }
-            return true;
+            return false;
         }).collect(Collectors.toList());
 
         log.info("get result list:{}", resultList);

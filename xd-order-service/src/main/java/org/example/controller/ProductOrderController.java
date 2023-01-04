@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * <p>
@@ -76,6 +77,17 @@ public class ProductOrderController {
         } else {
             log.error("create order fail:{}", jsonData.toString());
         }
+    }
+
+    @ApiOperation("paging order list")
+    @GetMapping("page")
+    public JsonData pageOrderList(
+            @ApiParam(value = "current page") @RequestParam(value = "page", defaultValue = "1") int page,
+            @ApiParam(value = "count in each page") @RequestParam(value = "size", defaultValue = "10") int size,
+            @ApiParam(value = "order status") @RequestParam(value = "state", defaultValue = "") String state) {
+
+        Map<String, Object> pageResult = productOrderService.page(page, size, state);
+        return JsonData.buildSuccess(pageResult);
     }
 
     private void writeData(HttpServletResponse response, JsonData jsonData) {

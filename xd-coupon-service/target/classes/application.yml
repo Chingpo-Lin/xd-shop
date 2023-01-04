@@ -71,4 +71,4 @@ mqconfig:
   coupon_release_routing_key: coupon.release.routing.key
 
   # msg expire time in ms, 15s in testing environment
-  ttl: 15000
+  ttl: 300000

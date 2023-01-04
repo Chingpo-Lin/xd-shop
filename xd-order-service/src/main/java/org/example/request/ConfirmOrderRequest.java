@@ -52,8 +52,8 @@ public class ConfirmOrderRequest {
     /**
      * real pay price after coupon, if not use will same as total price
      */
-    @JsonProperty("real_pay_price")
-    private BigDecimal realPayPrice;
+    @JsonProperty("real_pay_amount")
+    private BigDecimal realPayAmount;
 
     /**
      * token prevent order redundant

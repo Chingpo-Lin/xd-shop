@@ -3,9 +3,10 @@ package org.example.vo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class OrderItemVO {
+public class OrderItemVO implements Serializable {
 
     /**
      * product id

@@ -2,7 +2,10 @@ package org.example.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
+import com.alipay.api.domain.ItemVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
 import org.example.component.PayFactory;
@@ -30,15 +33,18 @@ import org.example.utils.JsonData;
 import org.example.vo.CouponRecordVO;
 import org.example.vo.OrderItemVO;
 import org.example.vo.ProductOrderAddressVO;
+import org.example.vo.ProductOrderVO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -94,6 +100,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
 
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
@@ -105,7 +112,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         log.info("receive address info:{}", addressVO);
 
         List<Long> productIdList = confirmOrderRequest.getProductIdList();
-        log.info("get product id list:{}", productIdList);
+
         JsonData cartItemData = productFeignService.confirmOrderCartItem(productIdList);
         log.info("get data:{}", cartItemData);
         List<OrderItemVO> orderItemVOList = cartItemData.getData(new TypeReference<>(){});
@@ -115,7 +122,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             // cart item product not exist
             throw new BizException(BizCodeEnum.ORDER_NOT_EXIST);
         }
-
+        log.info("order item VO list:{}", orderItemVOList);
         // check price, minus coupon
         this.checkPrice(orderItemVOList, confirmOrderRequest);
 
@@ -140,8 +147,17 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
         // create payment
         // payFactory.pay(null);
+        // because I don't implement official payment service.
+        // I just change payment to PAY status
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        productOrderMapper.updateOrderPayState(orderOutTradeNo,
+                ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
 
-        return JsonData.buildSuccess(addressVO);
+        return JsonData.buildSuccess("Congradulation! you have complete the order");
     }
 
     /**
@@ -189,7 +205,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         productOrderDO.setOrderType(ProductOrderTypeEnum.DAILY.name());
 
         // real pay amount
-        productOrderDO.setPayAmount(confirmOrderRequest.getRealPayPrice());
+        productOrderDO.setPayAmount(confirmOrderRequest.getRealPayAmount());
 
         // total price without using coupon
         productOrderDO.setTotalAmount(confirmOrderRequest.getTotalPrice());
@@ -261,6 +277,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         // product total price
         BigDecimal realPayAmount = new BigDecimal("0");
         if (orderItemVOList != null) {
+            log.info("order item list:{}", orderItemVOList);
             for (OrderItemVO orderItemVO : orderItemVOList) {
                 BigDecimal itemRealPayAmount = orderItemVO.getTotalPrice();
                 realPayAmount = realPayAmount.add(itemRealPayAmount);
@@ -269,9 +286,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
 
         // get coupon, check if can use
         CouponRecordVO couponRecordVO = getCartCouponRecord(confirmOrderRequest.getCouponRecordId());
-
         // calculate price of cart if satisfy coupon use condition
         if (couponRecordVO != null) {
+            log.info("coupon record info:{}", couponRecordVO);
             // calculate if satisfy condition
             if (realPayAmount.compareTo(couponRecordVO.getConditionPrice()) < 0) {
                 throw new BizException(BizCodeEnum.COUPON_GET_FAIL);
@@ -284,8 +301,8 @@ public class ProductOrderServiceImpl implements ProductOrderService {
             }
         }
 
-        if (realPayAmount.compareTo(confirmOrderRequest.getRealPayPrice()) != 0) {
-            log.error("price not consistent:{}", confirmOrderRequest);
+        if (realPayAmount.compareTo(confirmOrderRequest.getRealPayAmount()) != 0) {
+            log.error("price not consistent:{}, real price:{}", confirmOrderRequest, realPayAmount);
             throw new BizException(BizCodeEnum.ORDER_PRICE_FAIL);
         }
     }
@@ -404,5 +421,60 @@ public class ProductOrderServiceImpl implements ProductOrderService {
                     ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
             return true;
         }
+    }
+
+    /**
+     * paging order
+     * @param page
+     * @param size
+     * @param state
+     * @return
+     */
+    @Override
+    public Map<String, Object> page(int page, int size, String state) {
+
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        Page<ProductOrderDO> pageInfo = new Page<>(page, size);
+
+        IPage<ProductOrderDO> orderDOPage = null;
+
+        if (StringUtils.isEmpty(state)) {
+            orderDOPage = productOrderMapper.selectPage(pageInfo, new QueryWrapper<ProductOrderDO>()
+                    .eq("user_id", loginUser.getId()));
+        } else {
+            orderDOPage = productOrderMapper.selectPage(pageInfo, new QueryWrapper<ProductOrderDO>()
+                    .eq("user_id", loginUser.getId())
+                    .eq("state", state));
+        }
+
+        // get order list
+        List<ProductOrderDO> productOrderDOList = orderDOPage.getRecords();
+
+        List<ProductOrderVO> productOrderVOList = productOrderDOList.stream().map(orderDO -> {
+            List<ProductOrderItemDO> itemDOList = orderItemMapper.selectList(new QueryWrapper<ProductOrderItemDO>()
+                    .eq("product_order_id", orderDO.getId()));
+
+            List<OrderItemVO> itemVOList = itemDOList.stream().map(item -> {
+                OrderItemVO itemVO = new OrderItemVO();
+                BeanUtils.copyProperties(item, itemVO);
+                itemVO.setCount(item.getBuyNum());
+                itemVO.setPrice(item.getAmount());
+                itemVO.setProductTitle(item.getProductName());
+                log.info("item vo list:{}, item:{}", itemVO, item);
+                return itemVO;
+            }).collect(Collectors.toList());
+
+            ProductOrderVO productOrderVO = new ProductOrderVO();
+            BeanUtils.copyProperties(orderDO, productOrderVO);
+            productOrderVO.setOrderItemList(itemVOList);
+            return productOrderVO;
+        }).collect(Collectors.toList());
+
+        Map<String, Object> pageMap = new HashMap<>(3);
+        pageMap.put("total_record", orderDOPage.getTotal());
+        pageMap.put("total_page", orderDOPage.getPages());
+        pageMap.put("current_data",productOrderVOList);
+
+        return pageMap;
     }
 }

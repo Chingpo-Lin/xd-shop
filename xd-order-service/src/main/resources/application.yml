@@ -64,7 +64,7 @@ mqconfig:
   order_close_routing_key: order.close.routing.key
 
   # msg expire time in ms, 15s
-  ttl: 15000
+  ttl: 300000
 
 feign:
   client:
