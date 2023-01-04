@@ -13,6 +13,7 @@ spring:
         server-addr: 120.24.94.91:8848
       config:
         enabled: false
+
     gateway:
       routes: # array format
         - id: product-service # product service, unique routing
