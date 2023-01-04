@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
 import org.example.component.PayFactory;
 import org.example.config.RabbitMQConfig;
+import org.example.constants.CacheKey;
 import org.example.enums.*;
 import org.example.exception.BizException;
 import org.example.feign.CouponFeignService;
@@ -37,6 +38,9 @@ import org.example.vo.ProductOrderVO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +87,9 @@ public class ProductOrderServiceImpl implements ProductOrderService {
     @Autowired
     private PayFactory payFactory;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
     /**
      * 1. check if submit order redundant
      * 2. check address belongs to current user
@@ -104,6 +111,21 @@ public class ProductOrderServiceImpl implements ProductOrderService {
     public JsonData confirmOrder(ConfirmOrderRequest confirmOrderRequest) {
 
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
+
+        String orderToken = confirmOrderRequest.getToken();
+        if (StringUtils.isEmpty(orderToken)) {
+            throw new BizException(BizCodeEnum.ORDER_NOT_EXIST);
+        }
+
+        // atomic check token, delete token
+        String script = "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
+
+        Long result = redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),
+                Arrays.asList(String.format(CacheKey.SUBMIT_ORDER_TOKEN_KEY, loginUser.getId())), orderToken);
+
+        if (result == 0L) {
+            throw new BizException(BizCodeEnum.ORDER_NOT_EXIST);
+        }
 
         String orderOutTradeNo = CommonUtil.getStringNumRandom(32);
 
