@@ -171,11 +171,11 @@ public class ProductOrderServiceImpl implements ProductOrderService {
         // payFactory.pay(null);
         // because I don't implement official payment service.
         // I just change payment to PAY status
-        try {
-            TimeUnit.SECONDS.sleep(10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            TimeUnit.SECONDS.sleep(10);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         productOrderMapper.updateOrderPayState(orderOutTradeNo,
                 ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
 
