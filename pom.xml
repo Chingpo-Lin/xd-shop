@@ -31,6 +31,7 @@
         <commons.lang3.version>3.9</commons.lang3.version>
         <commons.codec.version>1.15</commons.codec.version>
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
+
         <docker.image.prefix>xd-cloud</docker.image.prefix>
         <!-- skip unit test -->
         <skipTests>true</skipTests>
