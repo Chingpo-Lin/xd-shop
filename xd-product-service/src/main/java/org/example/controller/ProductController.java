@@ -39,6 +39,16 @@ public class ProductController {
         return JsonData.buildSuccess(pageResult);
     }
 
+    @ApiOperation("test sentinel with limit qps = 1")
+    @GetMapping("page_flow_control")
+    public JsonData pageProductListWithSentinel(
+            @ApiParam(value = "current page") @RequestParam(value = "page", defaultValue = "1") int page,
+            @ApiParam(value = "count in each page") @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        Map<String, Object> pageResult = productService.page(page, size);
+        return JsonData.buildSuccess(pageResult);
+    }
+
     @ApiOperation("product detail")
     @GetMapping("detail/{product_id}")
     public JsonData detail(
