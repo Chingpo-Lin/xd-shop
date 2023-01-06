@@ -59,6 +59,10 @@ public enum BizCodeEnum {
     /**
      * file related
      */
+    CONTROL_FLOW(310001, "sentinel flow control"),
+    CONTROL_DEGRADE(310002, "sentinel degrade"),
+    CONTROL_AUTH(310003, "sentinel authority problem"),
+
     FILE_UPLOAD_USER_IMG_FAIL(600101,"user avatar upload fail");
 
     @Getter
