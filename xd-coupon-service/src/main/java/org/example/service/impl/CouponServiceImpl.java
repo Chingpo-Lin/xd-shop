@@ -97,7 +97,7 @@ public class CouponServiceImpl implements CouponService {
 
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
 
-        String lockKey = "lock:coupon:" + couponId;
+        String lockKey = "lock:coupon:" + couponId + ":" + loginUser.getId();
         RLock rLock = redissonClient.getLock(lockKey);
         // multiple thread enter will stop and release lock
         rLock.lock();
