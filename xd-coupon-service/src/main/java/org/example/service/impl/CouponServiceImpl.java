@@ -98,9 +98,9 @@ public class CouponServiceImpl implements CouponService {
         LoginUser loginUser = LoginInterceptor.threadLocal.get();
 
         String lockKey = "lock:coupon:" + couponId + ":" + loginUser.getId();
-        RLock rLock = redissonClient.getLock(lockKey);
-        // multiple thread enter will stop and release lock
-        rLock.lock();
+//        RLock rLock = redissonClient.getLock(lockKey);
+//        // multiple thread enter will stop and release lock
+//        rLock.lock();
         // lock with 10s expire time, but give up default watchdog function
 //        rLock.lock(10, TimeUnit.SECONDS);
 //        // comment part is use lua + redis, but we use redisson + redis to improve
@@ -119,42 +119,42 @@ public class CouponServiceImpl implements CouponService {
 //            e.printStackTrace();
 //        }
 
-        try {
-            // logic
-            CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
-                    .eq("id", couponId)
-                    .eq("category", category.name())
-                    .eq("publish", CouponPublishEnum.PUBLISH));
+//        try {
+        // logic
+        CouponDO couponDO = couponMapper.selectOne(new QueryWrapper<CouponDO>()
+                .eq("id", couponId)
+                .eq("category", category.name())
+                .eq("publish", CouponPublishEnum.PUBLISH));
 
-            if (couponDO == null) {
-                throw new BizException(BizCodeEnum.COUPON_NOT_EXIST);
-            }
+        if (couponDO == null) {
+            throw new BizException(BizCodeEnum.COUPON_NOT_EXIST);
+        }
 
-            // check if coupon can be added
-            checkCoupon(couponDO, loginUser.getId());
+        // check if coupon can be added
+        checkCoupon(couponDO, loginUser.getId());
 
-            // create coupon record
-            CouponRecordDO couponRecordDO = new CouponRecordDO();
-            BeanUtils.copyProperties(couponDO, couponRecordDO);
-            couponRecordDO.setCreateTime(new Date());
-            couponRecordDO.setUseState(CouponStateEnum.NEW.name());
-            couponRecordDO.setUserId(loginUser.getId());
-            couponRecordDO.setUserName(loginUser.getName());
-            couponRecordDO.setCouponId(couponId);
-            couponRecordDO.setId(null); // beanutils will copy coupon id to here which is wrong
+        // create coupon record
+        CouponRecordDO couponRecordDO = new CouponRecordDO();
+        BeanUtils.copyProperties(couponDO, couponRecordDO);
+        couponRecordDO.setCreateTime(new Date());
+        couponRecordDO.setUseState(CouponStateEnum.NEW.name());
+        couponRecordDO.setUserId(loginUser.getId());
+        couponRecordDO.setUserName(loginUser.getName());
+        couponRecordDO.setCouponId(couponId);
+        couponRecordDO.setId(null); // beanutils will copy coupon id to here which is wrong
 
-            // minus stock
-            int rows = couponMapper.reduceStock(couponId);
+        // minus stock
+        int rows = couponMapper.reduceStock(couponId);
 
-            if (rows == 1) {
-                // save when success deduct stock
-                couponRecordMapper.insert(couponRecordDO);
-            } else {
-                log.warn("fail to get coupon:{}, user:{}", couponId, loginUser);
-                throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
-            }
-        } finally {
-            rLock.unlock();
+        if (rows == 1) {
+            // save when success deduct stock
+            couponRecordMapper.insert(couponRecordDO);
+        } else {
+            log.warn("fail to get coupon:{}, user:{}", couponId, loginUser);
+            throw new BizException(BizCodeEnum.COUPON_NO_STOCK);
+        }
+//        } finally {
+//            rLock.unlock();
                 // script can ensure atomic since get and del success together
 //                String script = "if redis.call('get',KEYS[1]) == ARGV[1]" +
 //                        " then return redis.call('del',KEYS[1])" +
@@ -162,7 +162,7 @@ public class CouponServiceImpl implements CouponService {
 //
 //                Integer result = redisTemplate.execute(new DefaultRedisScript<>(script, Integer.class),
 //                        Arrays.asList(lockKey), uuid);
-        }
+//        }
 
 //        } else {
             // lock fail
