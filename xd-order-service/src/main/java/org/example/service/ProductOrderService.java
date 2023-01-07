@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.example.request.ConfirmOrderRequest;
 import org.example.utils.JsonData;
 
+import java.util.Map;
+
 /**
  * <p>
  *  服务类
@@ -36,4 +38,6 @@ public interface ProductOrderService {
      * @return
      */
     boolean closeProductOrder(OrderMessage orderMessage);
+
+    Map<String, Object> page(int page, int size, String state);
 }

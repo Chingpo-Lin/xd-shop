@@ -5,7 +5,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.example.enums.BizCodeEnum;
 import org.example.enums.CouponCategoryEnum;
+import org.example.interceptor.LoginInterceptor;
+import org.example.model.LoginUser;
 import org.example.request.NewUserCouponRequest;
 import org.example.service.CouponService;
 import org.example.utils.JsonData;
@@ -52,8 +55,21 @@ public class CouponController {
     public JsonData addPromotionCoupon(
             @ApiParam(value = "coupon id", required = true) @PathVariable("coupon_id") long couponId) {
 
-        JsonData jsonData = couponService.addCoupon(couponId, CouponCategoryEnum.PROMOTION);
-        return jsonData;
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String lockKey = "lock:coupon:" + couponId + ":" + loginUser.getId();
+        RLock rLock = redissonClient.getLock(lockKey);
+        // multiple thread enter will stop and release lock
+        rLock.lock();
+
+        try {
+            JsonData jsonData = couponService.addCoupon(couponId, CouponCategoryEnum.PROMOTION);
+            return jsonData;
+        } catch (Exception e) {
+            log.error("add error:{}", e);
+            return JsonData.buildResult(BizCodeEnum.COUPON_GET_FAIL);
+        } finally {
+            rLock.unlock();
+        }
     }
 
     @GetMapping("lock")

@@ -42,12 +42,11 @@ public class CouponMQListener {
         log.info("listen msg: releaseCouponRecord content: {}", recordMessage);
         long msgTag = message.getMessageProperties().getDeliveryTag();
 
-        boolean flag = couponRecordService.releaseCouponRecord(recordMessage);
-
         // prevent same unlock task enter in concurrency
         // if parallel consume, don't need lock
         Lock lock = redissonClient.getLock("lock:coupon_record_release:" + recordMessage.getTaskId());
         lock.lock();
+        boolean flag = couponRecordService.releaseCouponRecord(recordMessage);
 
         try {
             if (flag) {

@@ -1,0 +1,24 @@
+package org.example.config;
+
+/**
+ * alipay config
+ *
+ * ps: this need weeks to apply, so I skip it but watch tutorial and somewhat know how to do it.
+ */
+public class AlipayConfig {
+
+    /**
+     * Alipay appid
+     */
+    public static final String APPID = "";
+
+    /**
+     * application private key
+     */
+    public static final String APP_PRI_KEY = "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCshge2N8fWhqfcptsXv+jJmgh4ce4gzquFVncaMulyzmqddEkpEi7JNs+FLR0lRM+RZ7j2mg2qJgMispBBGFXTi7CRx4T+ye1Pxnbls4299hGEbqArWT2sCi/PAT1qmlWxNzHj9XLFmSKG6eaIUQ7Q3ldKEKLdKw6Y9hykap3+c9tNdFkdXCAmz9TyKB+p1T38WctyDlp9IEtOc8HkpKv1MBodBLogc+PKK/C1UiQGXBKnFyhZkJOKiV25OKzjMxbpsWZxUY3m8OMmpnIwZXNsr6BfGsV7pZ2SLR69GvyLurQNFtDTFizR9Wkku88C7Na4ZCP/tLTFNoC+9QgjIgeJAgMBAAECggEBAKDhU6uulKIOa9atmj2pbjEhfKikxYS+dOAgY2yA8YVny7AM0nSESjDE9fuguD8azd0wNiFwQzHZxK7EiRTK1q4w43Tt862NK8lqr1FAgPsVzfwLFT2XOJWH4lFNPLJ+PU7Gw7VqG578UGAzGhEgVYqc7BVbMiTAlBo71zXTXoX6htkFEoaO4eDZgsUkZA6CNlBc1LjxdsnoqP83NkLBlHl8p+UMPnQHp0Ppt/L/h0F4yTjHkCMeruT6oBi2N5l5Z1nCXvHUl4D/Ka9lWF+N/HWVEfVGXplK1RISHuUIIGNUHQEDOiI+hA1547p2hJ5fKnpVn9otY07tcXMilcbu14kCgYEA49buCiUTZVag48MORCJzrNl2w62a9w0gaxhszRdNVreEyU2rkio2MUQsytckYaFkAhmdjL59UafpaKA+d5bQ93sDDupEOMcPfuRCcxam9tQFWcqk+bIV16iAD+WCOLILOxh1T7m2nujjAtGrHX6QrCMHJPhgQyhW6XDgu4dK308CgYEAwdjYv29PTfHsW2ldF7YJL6zSgTq+ic1QSDJXDvdQhETx2/U091YIO7hIzlVydMUhCZnUN9cZP1b+icF6fM/8WJKFuTQMAvlDsZejfiEQlKAqTG8+oPyVr7Dto2aPMzXMDlw87JacLLyNdLly9/y7otLSgJM99+YkckxC2/JBNacCgYBdCOGwoM0Xv1T5TCfiKJNFjJMTeitiICkRsiqTYKWC+HMvZBjgGX6BhY4o0csYVreop98OnqY7lq4Xu/9mA96Wf9OS3pQ2/wnTzc9YgXJyLcd1j+rnzxFeO373fsc68XDmk6krgfERWJWCDC2sYIcg0zjSnt1n7uv2bNJHoQowvwKBgQCo4s5kawwC8sVkFvYeVGDIgp+cK5wZ3yEU5Zbn2RzzQEYfxxDwdKoTrcjwy40+owjXnohAZkz+3EJDrqeS2noWiQGsi+XzKUyLC3xLxW72rlxr33gHNkkLmvBPrmkQyswPrtj9n3JNn7D2gyPhXvXzNA5mKuKQephCZKLTkcqyfQKBgEeeqOhVwhT136VeFtDbh/YcigBXgfOvG4e6XdUy+8hAsi0ICqH/ILz6X/FP/3h8xmo/UZeMqMtg+GEQKwQ/nutIYTZ8lKxiwQT5nbybGCTm7FN7ssIZyKX3/PVnsfynuMiZR/zGaZZCEtUqVYcNw+Mr2wzNEtOug+Cf096X4VnU";
+
+    /**
+     * ALIPAY public key
+     */
+    public static final String ALIPAY_PUB_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArIYHtjfH1oan3KbbF7/oyZoIeHHuIM6rhVZ3GjLpcs5qnXRJKRIuyTbPhS0dJUTPkWe49poNqiYDIrKQQRhV04uwkceE/sntT8Z25bONvfYRhG6gK1k9rAovzwE9appVsTcx4/VyxZkihunmiFEO0N5XShCi3SsOmPYcpGqd/nPbTXRZHVwgJs/U8igfqdU9/FnLcg5afSBLTnPB5KSr9TAaHQS6IHPjyivwtVIkBlwSpxcoWZCTiolduTis4zMW6bFmcVGN5vDjJqZyMGVzbK+gXxrFe6Wdki0evRr8i7q0DRbQ0xYs0fVpJLvPAuzWuGQj/7S0xTaAvvUIIyIHiQIDAQAB";
+}

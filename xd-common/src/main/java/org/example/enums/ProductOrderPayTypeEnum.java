@@ -9,6 +9,10 @@ public enum ProductOrderPayTypeEnum {
      * */
     CREDIT,
     /**
+     * alipay
+     */
+    ALIPAY,
+    /**
      * debit payment
      * */
     DEBIT;

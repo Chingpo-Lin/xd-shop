@@ -13,9 +13,9 @@ import java.util.Date;
 public class JWTUtil {
 
     /**
-     * token expire in 7 days
+     * token expire in 7 days (7 * 5 for test)
      */
-    private static final long EXPIRE = 1000 * 60 * 60 * 24 * 7; // 1 week
+    private static final long EXPIRE = 1000 * 60 * 60 * 24 * 7 * 5; // 5 week for test
 
     /**
      * secret for encode

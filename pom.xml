@@ -27,10 +27,11 @@
         <spring.cloud.version>Hoxton.SR8</spring.cloud.version>
         <alibaba.cloud.version>2.2.1.RELEASE</alibaba.cloud.version>
         <mybatisplus.boot.starter.version>3.4.0</mybatisplus.boot.starter.version>
-        <lombok.version>1.18.16</lombok.version>
+        <lombok.version>1.18.22</lombok.version>
         <commons.lang3.version>3.9</commons.lang3.version>
         <commons.codec.version>1.15</commons.codec.version>
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
+
         <docker.image.prefix>xd-cloud</docker.image.prefix>
         <!-- skip unit test -->
         <skipTests>true</skipTests>

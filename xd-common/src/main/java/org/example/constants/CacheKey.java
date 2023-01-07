@@ -11,4 +11,9 @@ public class CacheKey {
      * cart hash, key is unique for user
      */
     public static final String CART_KEY = "cart:%s";
+
+    /**
+     * submit order token
+     */
+    public static final String SUBMIT_ORDER_TOKEN_KEY = "order:submit:%s";
 }

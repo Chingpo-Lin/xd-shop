@@ -6,16 +6,24 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apiguardian.api.API;
+import org.example.constants.CacheKey;
 import org.example.enums.BizCodeEnum;
 import org.example.enums.ProductOrderPayTypeEnum;
+import org.example.interceptor.LoginInterceptor;
+import org.example.model.LoginUser;
 import org.example.request.ConfirmOrderRequest;
 import org.example.service.ProductOrderService;
+import org.example.utils.CommonUtil;
 import org.example.utils.JsonData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -33,6 +41,20 @@ public class ProductOrderController {
 
     @Autowired
     private ProductOrderService productOrderService;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+    
+    @ApiOperation("get token for order")
+    @GetMapping("get_token")
+    private JsonData getOrderToken() {
+        LoginUser loginUser = LoginInterceptor.threadLocal.get();
+        String key = String.format(CacheKey.SUBMIT_ORDER_TOKEN_KEY, loginUser.getId());
+
+        String token = CommonUtil.getStringNumRandom(32);
+        redisTemplate.opsForValue().set(key, token, 30, TimeUnit.MINUTES);
+        return JsonData.buildSuccess(token);
+    }
 
     /**
      * query order state
@@ -76,6 +98,17 @@ public class ProductOrderController {
         } else {
             log.error("create order fail:{}", jsonData.toString());
         }
+    }
+
+    @ApiOperation("paging order list")
+    @GetMapping("page")
+    public JsonData pageOrderList(
+            @ApiParam(value = "current page") @RequestParam(value = "page", defaultValue = "1") int page,
+            @ApiParam(value = "count in each page") @RequestParam(value = "size", defaultValue = "10") int size,
+            @ApiParam(value = "order status") @RequestParam(value = "state", defaultValue = "") String state) {
+
+        Map<String, Object> pageResult = productOrderService.page(page, size, state);
+        return JsonData.buildSuccess(pageResult);
     }
 
     private void writeData(HttpServletResponse response, JsonData jsonData) {
