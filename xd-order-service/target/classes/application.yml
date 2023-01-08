@@ -1,0 +1,77 @@
+#
+#server:
+#  port: 9004
+#
+#spring:
+#  application:
+#    name: xd-order-service
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 120.24.94.xxx:8848
+#
+#  # rabbit mq config
+#  rabbitmq:
+#    host: 120.24.94.xxx
+#    port: 5672
+#    virtual-host: /
+#    password: password
+#    username: admin
+#    # manually confirm msg
+#    listener:
+#      simple:
+#        acknowledge-mode: manual
+#
+#  # database config
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://120.24.94.xxx:3306/xd_order?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=US/Pacific
+#    username: root
+#    password: xxx
+#  # redis config
+#  redis:
+#    host: 120.24.94.xxx
+#    port: 6379
+#    password: xxx
+#
+## config mybatis plus print sql
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#
+## config log level,ERROR/WARN/INFO/DEBUG,default is show when higher than INFO level
+#logging:
+#  level:
+#    root: INFO
+#
+#
+##custom mq config，send close order msg-> delay exchange -> lock.queue -> dead letter exchange -> release.queue
+#mqconfig:
+#
+#  # delay queue, don't have consumer
+#  order_close_delay_queue: order.close.delay.queue
+#
+#  # redirect queue after msg expire
+#  order_close_queue: order.close.queue
+#
+#  # exchange
+#  order_event_exchange: order.event.exchange
+#
+#  # routing key for enter delay queue
+#  order_close_delay_routing_key: order.close.delay.routing.key
+#
+#  # routing key for enter release queue after msg expire
+#  order_close_routing_key: order.close.routing.key
+#
+#  # msg expire time in ms, 15s
+#  ttl: 300000
+#
+#feign:
+#  client:
+#    config:
+#      default:
+#        connectTimeout: 60000
+#        readTimeout: 10000
+#
+#
+#

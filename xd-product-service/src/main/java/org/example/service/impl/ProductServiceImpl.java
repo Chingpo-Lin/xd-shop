@@ -24,6 +24,7 @@ import org.example.vo.ProductVO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -67,6 +68,7 @@ public class ProductServiceImpl implements ProductService {
      * @return
      */
     @Override
+    @Cacheable(value = {"product"}, key = "#root.methodName + #page + '_' + #size")
     public Map<String, Object> page(int page, int size) {
 
         Page<ProductDO> pageInfo = new Page<>(page, size);

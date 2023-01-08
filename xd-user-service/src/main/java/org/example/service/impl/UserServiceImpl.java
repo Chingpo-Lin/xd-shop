@@ -79,20 +79,20 @@ public class UserServiceImpl implements UserService {
 
         userDO.setCreateTime(new Date());
         userDO.setSlogan("Hello, I am " + userDO.getName());
-        // set password TODO
+        // set password
         // generate password with MD5 + secret
         userDO.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
 
         String cryptPwd = Md5Crypt.md5Crypt(registerRequest.getPwd().getBytes(), userDO.getSecret());
         userDO.setPwd(cryptPwd);
 
-        // check if email exist TODO
+        // check if email exist
         if (checkUnique(userDO.getMail())) {
             // store into db
             int rows = userMapper.insert(userDO);
             log.info("rows:{}, register success:{}", rows, userDO.toString());
 
-            // new user benefit TODO
+            // new user benefit
             userRegisterInitTask(userDO);
             return JsonData.buildSuccess();
         } else {
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
             UserDO userDO = userDOList.get(0);
             String cryptPwd = Md5Crypt.md5Crypt(userLoginRequest.getPwd().getBytes(), userDO.getSecret());
             if (cryptPwd.equals(userDO.getPwd())) {
-                // login success, generate token TODO
+                // login success, generate token
                 LoginUser loginUser = LoginUser.builder().build();
                 BeanUtils.copyProperties(userDO, loginUser);
                 String accessToken = JWTUtil.geneJsonWebToken(loginUser);

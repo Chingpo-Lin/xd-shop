@@ -38,6 +38,7 @@ import org.example.vo.ProductOrderVO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -453,6 +454,7 @@ public class ProductOrderServiceImpl implements ProductOrderService {
      * @return
      */
     @Override
+    @Cacheable(value = {"order"}, key = "#root.methodName + #page + '_' + #size + '_' + #state")
     public Map<String, Object> page(int page, int size, String state) {
 
         LoginUser loginUser = LoginInterceptor.threadLocal.get();

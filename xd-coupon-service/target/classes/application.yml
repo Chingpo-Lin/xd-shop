@@ -1,0 +1,74 @@
+#
+#server:
+#  port: 9002
+#
+#spring:
+#  application:
+#    name: xd-coupon-service
+#  cloud:
+#    nacos:
+#      discovery:
+#        server-addr: 120.24.94.xxx:8848
+#
+#  # rabbit mq config
+#  rabbitmq:
+#    host: 120.24.94.xxx
+#    port: 5672
+#    virtual-host: /
+#    password: password
+#    username: admin
+#    # manually confirm msg
+#    listener:
+#      simple:
+#        acknowledge-mode: manual
+#
+#  # database config
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://120.24.94.xxx:3306/xd_coupon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=US/Pacific
+#    username: root
+#    password: xxx
+#  # redis config
+#  redis:
+#    host: 120.24.94.xxx
+#    port: 6379
+#    password: xxx
+#
+## config mybatis plus print sql
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#
+## config log level,ERROR/WARN/INFO/DEBUG,default is show when higher than INFO level
+#logging:
+#  level:
+#    root: INFO
+#
+## seata config
+##seata:
+##  tx-service-group: ${spring.application.name}-group
+##  service:
+##    grouplist:
+##      xdbob: 127.0.0.1:8091
+##    vgroup-mapping:
+##      xd-coupon-service-group: xdbob
+#
+## custom mq config，send lock stock msg->delay exchange->lock.queue->dead letter exchange->release.queue
+#mqconfig:
+#  # delay queue, cannot be listen by consumer
+#  coupon_release_delay_queue: coupon.release.delay.queue
+#
+#  # redirect queue after delay queue msg expired
+#  coupon_release_queue: coupon.release.queue
+#
+#  # exchange
+#  coupon_event_exchange: coupon.event.exchange
+#
+#  # routing key to enter delay queue
+#  coupon_release_delay_routing_key: coupon.release.delay.routing.key
+#
+#  # msg expired ，key to enter released dead letter queue
+#  coupon_release_routing_key: coupon.release.routing.key
+#
+#  # msg expire time in ms, 15s in testing environment
+#  ttl: 300000

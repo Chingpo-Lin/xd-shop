@@ -15,7 +15,7 @@ public class JWTUtil {
     /**
      * token expire in 7 days (7 * 5 for test)
      */
-    private static final long EXPIRE = 1000 * 60 * 60 * 24 * 7 * 5; // 5 week for test
+    private static final long EXPIRE = 1000 * 60 * 60 * 24 * 7 * 20; // 20 week for test
 
     /**
      * secret for encode
@@ -53,6 +53,8 @@ public class JWTUtil {
                 .compact();
         token = TOKEN_PREFIX + token;
 
+        log.info("decode is:{}", checkJWT(token).toString());
+
         return token;
     }
 
@@ -63,6 +65,7 @@ public class JWTUtil {
      */
     public static Claims checkJWT(String token) {
         try {
+            log.info("token decode:{}", token);
             final Claims claims = Jwts.parser().setSigningKey(SECRET)
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .getBody();
