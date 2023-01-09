@@ -8,12 +8,12 @@
 #  cloud:
 #    nacos:
 #      discovery:
-#        server-addr: 120.24.94.xxx:8848
+#        server-addr: xxx
 #
 #  # rabbit mq config
 #  rabbitmq:
-#    host: 120.24.94.xxx
-#    port: 5672
+#    host: xxx
+#    port: xxx
 #    virtual-host: /
 #    password: password
 #    username: admin
@@ -25,20 +25,20 @@
 #  # database config
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://120.24.94.xxx:3306/xd_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=US/Pacific
+#    url: jdbc:mysql://xxx/xd_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=US/Pacific
 #    username: root
 #    password: xxx
 #  # redis config
 #  redis:
-#    host: 120.24.94.xxx
-#    port: 6379
+#    host: xxx
+#    port:xxx
 #    password: xxx
 #  # mail config
 #  mail:
 #    host: smtp.163.com # sending server
-#    username: m13823601165@163.com
-#    password: GJSNNUGBGTDTLQKZ # confirmation code
-#    from: m13823601165@163.com # sending mail, same use username
+#    username: xxx
+#    password: xxx # confirmation code
+#    from: xxx # sending mail, same use username
 #    properties.mail.smtp.starttls.enable: true
 #    properties.mail.smtp.starttls.required: true
 #    properties.mail.smtp.ssl.enable: true
@@ -58,10 +58,10 @@
 ## Alibaba Cloud OSS config
 #aliyun:
 #  oss:
-#    endpoint: oss-us-west-1.aliyuncs.com
-#    access-key-id: LTAI5tDy8ikYc6zeLveoUhce
-#    access-key-secret: N891ThTNJJYoXaOz5TmV7MGOeUgTjJ
-#    bucket-name: bob-xdshop-img
+#    endpoint: xxx
+#    access-key-id: xxx
+#    access-key-secret: xxx
+#    bucket-name: xxx
 #
 ## seata config
 ##seata:

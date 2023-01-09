@@ -1,6 +1,6 @@
 #
 #server:
-#  port: 9002
+#  port: xxx
 #
 #spring:
 #  application:
@@ -8,12 +8,12 @@
 #  cloud:
 #    nacos:
 #      discovery:
-#        server-addr: 120.24.94.xxx:8848
+#        server-addr: xxx
 #
 #  # rabbit mq config
 #  rabbitmq:
-#    host: 120.24.94.xxx
-#    port: 5672
+#    host: xxx
+#    port: xxx
 #    virtual-host: /
 #    password: password
 #    username: admin
@@ -25,13 +25,13 @@
 #  # database config
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://120.24.94.xxx:3306/xd_coupon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=US/Pacific
+#    url: jdbc:mysql://xxx/xd_coupon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=US/Pacific
 #    username: root
 #    password: xxx
 #  # redis config
 #  redis:
-#    host: 120.24.94.xxx
-#    port: 6379
+#    host: xxx
+#    port: xxx
 #    password: xxx
 #
 ## config mybatis plus print sql
