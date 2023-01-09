@@ -3,6 +3,5 @@
 ## All written by Chingpo Lin
 
 ## Project Postman Collection are under public/postman
-## Project Structures are under public/architect folder
-
+## Project Structures are under public/img/architect folder
 
