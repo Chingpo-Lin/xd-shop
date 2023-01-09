@@ -43,6 +43,7 @@ public class CartServiceImpl implements CartService {
         int buyNum = cartItemRequest.getBuyNum();
 
         // get cart from redis
+        // intended to store cart key, product id, cartItems
         BoundHashOperations<String, Object, Object> myCart = getMyCartOps();
         
         Object cacheObj = myCart.get(productId);
@@ -118,7 +119,7 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
-     * confirm cat product info
+     * confirm cart product info
      * @param productIdList
      * @return
      */
