@@ -4,4 +4,5 @@
 
 ## Project Postman Collection are under public/postman
 ## Project Structures are under public/img/architect folder
+![image](https://raw.githubusercontent.com/Chingpo-Lin/xd-shop/master/public/img/architecture/xdshop_architecture.png)
 
