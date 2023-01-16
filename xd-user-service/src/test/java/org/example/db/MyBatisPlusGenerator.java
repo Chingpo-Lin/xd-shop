@@ -47,9 +47,9 @@ public class MyBatisPlusGenerator {
         dsConfig.setDbType(DbType.MYSQL)
                 .setDriverName("com.mysql.cj.jdbc.Driver")
                 //TODO  TODO  TODO  TODO
-                .setUrl("jdbc:mysql://120.24.94.91:3306/xd_user?useSSL=false")
-                .setUsername("root")
-                .setPassword("xdclass.net168");
+                .setUrl("jdbc:mysql://.../xd_user?useSSL=false")
+                .setUsername("...")
+                .setPassword("...");
 
         //3. strategy config globalConfiguration
         StrategyConfig stConfig = new StrategyConfig();
